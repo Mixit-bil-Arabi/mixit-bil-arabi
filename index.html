@@ -1,0 +1,1170 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Mixit Bil Arabi: community song-building platform and record label for the Middle East. Clickable prototype.">
+<title>Mixit Bil Arabi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+/* Layout: dark violet-to-teal studio rail on the side, light lavender-to-ice workspace; every song is a tree of layers. */
+:root{
+  --deep-a:#24104F; --deep-b:#0F0B24; --deep-c:#072A3C;
+  --on-deep:#F4F0FF; --on-deep-muted:#B9B0DA; --deep-line:rgba(255,255,255,.12);
+  --bg:#F8F6FF; --bg-2:#EEF4FB; --surface:#FFFFFF; --surface-2:#F4F1FD; --line:#E3DEF3;
+  --fg:#1B1433; --muted:#665F80; --soft:#8D86A8;
+  --violet:#7C3AED; --pink:#E0559B; --cyan:#0EA5C4; --amber:#D98A0B; --green:#16A34A; --red:#DC2626;
+  --pink-hi:#FF7AB8; --cyan-hi:#22D3EE; --violet-hi:#A78BFA;
+  --c-beat:var(--violet); --c-lyric:var(--pink); --c-melody:var(--cyan); --c-instrument:var(--amber);
+  --tint-beat:#EFE7FF; --tint-lyric:#FDE8F2; --tint-melody:#E1F6FB; --tint-instrument:#FBF0DC;
+  --shadow:0 1px 2px rgba(36,16,79,.06),0 8px 24px rgba(36,16,79,.07);
+  --f-head:'Rubik','IBM Plex Sans Arabic',system-ui,sans-serif;
+  --f-body:'DM Sans','IBM Plex Sans Arabic',system-ui,sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E0A20; --bg-2:#0A1A26; --surface:#18122F; --surface-2:#1F1840; --line:#2E2654;
+  --fg:#EFEAFF; --muted:#A79FC8; --soft:#7F77A3;
+  --violet:#A78BFA; --pink:#FF7AB8; --cyan:#22D3EE; --amber:#F5B94A; --green:#4ADE80; --red:#F87171;
+  --tint-beat:#2A1E52; --tint-lyric:#3A1A33; --tint-melody:#0F2E3B; --tint-instrument:#33260F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E0A20; --bg-2:#0A1A26; --surface:#18122F; --surface-2:#1F1840; --line:#2E2654;
+  --fg:#EFEAFF; --muted:#A79FC8; --soft:#7F77A3;
+  --violet:#A78BFA; --pink:#FF7AB8; --cyan:#22D3EE; --amber:#F5B94A; --green:#4ADE80; --red:#F87171;
+  --tint-beat:#2A1E52; --tint-lyric:#3A1A33; --tint-melody:#0F2E3B; --tint-instrument:#33260F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{background:var(--bg);background-image:linear-gradient(160deg,var(--bg) 0%,var(--bg-2) 100%);background-attachment:fixed;color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
+h1,h2,h3,h4{font-family:var(--f-head);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(28px,4vw,40px);font-weight:700;line-height:1.1}
+h2{font-size:22px;font-weight:600}
+h3{font-size:17px;font-weight:600}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--violet)}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:6px}
+.mono{font-family:var(--f-mono);font-size:12px;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.eyebrow{font-family:var(--f-head);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+[dir="rtl"] .eyebrow{letter-spacing:0}
+
+/* shell */
+.app{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh}
+.app.gate{grid-template-columns:minmax(0,1fr)}
+.app.gate .side,.app.gate .topbar{display:none}
+.side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:22px;padding:24px 16px;background:linear-gradient(170deg,var(--deep-a) 0%,var(--deep-b) 55%,var(--deep-c) 100%);color:var(--on-deep);overflow:hidden}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--f-head);font-weight:800;font-size:20px;letter-spacing:-.02em;color:var(--on-deep);text-decoration:none;padding-inline:8px}
+.logo small{display:block;font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--on-deep-muted)}
+.logo-mark{display:flex;align-items:flex-end;gap:3px;height:26px}
+.logo-mark i{display:block;width:4px;border-radius:2px;background:linear-gradient(180deg,#FF7AB8,#22D3EE)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--on-deep-muted);text-decoration:none;font-weight:500}
+.nav a svg{width:18px;height:18px;flex:none}
+.nav a:hover{background:rgba(255,255,255,.06);color:var(--on-deep)}
+.nav a.on{background:rgba(255,255,255,.11);color:var(--on-deep)}
+.nav a.on svg{color:#FF7AB8}
+.side-foot{margin-top:auto;display:flex;flex-direction:column;gap:12px;position:relative;z-index:1}
+.side-wave{position:absolute;inset:auto 0 0 0;height:140px;opacity:.5;pointer-events:none}
+.me-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;background:rgba(255,255,255,.07);color:var(--on-deep);text-decoration:none}
+.me-card b{display:block;font-size:14px}
+.me-card span{font-size:12px;color:var(--on-deep-muted)}
+.lang-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid var(--deep-line);background:transparent;color:var(--on-deep);cursor:pointer;font-weight:500}
+.lang-btn:hover{background:rgba(255,255,255,.08)}
+.topbar{display:none}
+main{min-width:0;padding-block:28px 120px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+
+/* bits */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;font-size:14px;text-decoration:none;color:var(--fg);white-space:nowrap}
+.btn:hover{border-color:var(--violet)}
+.btn svg{width:16px;height:16px}
+.btn.primary{background:linear-gradient(120deg,#7C3AED,#C04FD6 55%,#FF7AB8);border-color:transparent;color:#fff}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent}
+.btn.sm{padding:6px 12px;font-size:13px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.icon-btn{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--fg);flex:none}
+.icon-btn svg{width:16px;height:16px}
+.icon-btn.play{background:var(--fg);color:var(--surface);border-color:transparent}
+.icon-btn.play.on{background:linear-gradient(135deg,#7C3AED,#22D3EE);color:#fff}
+.like{display:inline-flex;align-items:center;gap:6px;border:0;background:none;cursor:pointer;color:var(--muted);font-weight:600;font-size:13px;padding:6px 8px;border-radius:999px}
+.like svg{width:16px;height:16px}
+.like.on{color:var(--pink)}
+.like.on svg{fill:currentColor}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.tag.beat{background:var(--tint-beat);color:var(--c-beat)}
+.tag.lyric{background:var(--tint-lyric);color:var(--c-lyric)}
+.tag.melody{background:var(--tint-melody);color:var(--c-melody)}
+.tag.instrument{background:var(--tint-instrument);color:var(--c-instrument)}
+.tag.plain{background:var(--surface-2);color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.pill .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.st-rising{color:var(--cyan)} .st-review{color:var(--amber)} .st-offer{color:var(--violet)} .st-signed{color:var(--green)} .st-open{color:var(--muted)}
+.av{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;font-family:var(--f-head);font-weight:600;font-size:12px;color:#fff;flex:none}
+.av.lg{width:72px;height:72px;font-size:26px}
+.avs{display:flex}
+.avs .av{border:2px solid var(--surface);margin-inline-start:-8px}
+.avs .av:first-child{margin-inline-start:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.between{justify-content:space-between}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:500;font-size:13px;color:var(--fg)}
+.chip.on{background:var(--fg);color:var(--surface);border-color:var(--fg)}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label,.field .lbl{font-size:13px;font-weight:600}
+.input,select.input,textarea.input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--fg)}
+textarea.input{min-height:110px;resize:vertical;line-height:1.7}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.hint{font-size:12px;color:var(--muted)}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.section-head p{color:var(--muted);max-width:62ch}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+.check input{margin-top:4px;accent-color:var(--violet);width:16px;height:16px;flex:none}
+input[type=range]{accent-color:var(--violet);width:100%}
+
+/* waveform */
+.wave{display:flex;align-items:center;gap:2px;height:40px}
+.wave i{flex:1;border-radius:2px;background:currentColor;opacity:.55;min-width:2px}
+.playing .wave i{opacity:.95}
+.lyric-snip{font-size:15px;line-height:1.9;color:var(--fg);font-family:var(--f-body);min-height:40px;direction:rtl;text-align:right}
+
+/* piece card */
+.pieces{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.piece{padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.piece .title{font-family:var(--f-head);font-weight:600;font-size:16px;line-height:1.25}
+.piece .by{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);text-decoration:none}
+.piece .by:hover b{color:var(--violet)}
+.piece .by b{color:var(--fg);font-weight:600}
+.piece .meta{color:var(--muted)}
+.piece .actions{display:flex;align-items:center;gap:6px;margin-top:auto}
+.piece .actions .btn{margin-inline-start:auto}
+.c-beat{color:var(--c-beat)} .c-lyric{color:var(--c-lyric)} .c-melody{color:var(--c-melody)} .c-instrument{color:var(--c-instrument)}
+
+/* hero bands */
+.band{position:relative;overflow:hidden;border-radius:20px;padding:28px;background:linear-gradient(125deg,var(--deep-a) 0%,var(--deep-b) 55%,var(--deep-c) 100%);color:var(--on-deep);display:flex;flex-direction:column;gap:14px}
+.band .muted,.band .eyebrow{color:var(--on-deep-muted)}
+.band canvas{position:absolute;inset:auto 0 0 0;width:100%;height:120px;opacity:.55;pointer-events:none}
+.band > *:not(canvas){position:relative}
+.band .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:var(--on-deep)}
+.band .btn.primary{background:linear-gradient(120deg,#7C3AED,#C04FD6 55%,#FF7AB8);border-color:transparent;color:#fff}
+.band .icon-btn.play{background:#fff;color:#24104F}
+.band .like{color:var(--on-deep-muted)} .band .like.on{color:#FF7AB8}
+.band .pill{border-color:rgba(255,255,255,.2);color:var(--on-deep)}
+.band .pill.st-rising .dot{background:#22D3EE}.band .pill.st-review .dot{background:#F5B94A}.band .pill.st-offer .dot{background:#A78BFA}.band .pill.st-signed .dot{background:#4ADE80}
+.stats{display:flex;gap:28px;flex-wrap:wrap}
+.stat b{display:block;font-family:var(--f-head);font-size:24px;font-weight:600;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--on-deep-muted)}
+
+/* trending songs */
+.songs-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.song-card{padding:18px;display:flex;flex-direction:column;gap:12px;cursor:pointer;text-decoration:none;color:var(--fg);min-width:0}
+.song-card:hover{border-color:var(--violet)}
+.stack{display:flex;flex-direction:column;gap:4px}
+.stack i{display:block;height:6px;border-radius:3px}
+
+/* gate */
+.gate-wrap{min-height:100vh;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
+.gate-hero{position:relative;overflow:hidden;background:linear-gradient(160deg,var(--deep-a) 0%,var(--deep-b) 55%,var(--deep-c) 100%);color:var(--on-deep);padding-block:48px;padding-left:max(32px,env(safe-area-inset-left,0px));padding-right:32px;display:flex;flex-direction:column;gap:26px;justify-content:center}
+.gate-hero h1{font-size:clamp(38px,6vw,68px);font-weight:800;letter-spacing:-.03em;max-width:12ch}
+.gate-hero h1 em{font-style:normal;background:linear-gradient(90deg,#FF7AB8,#A78BFA,#22D3EE);-webkit-background-clip:text;background-clip:text;color:transparent}
+.gate-hero p{color:var(--on-deep-muted);font-size:17px;max-width:46ch}
+.gate-hero canvas{position:absolute;inset:auto 0 0 0;width:100%;height:220px;pointer-events:none}
+.gate-hero > *:not(canvas){position:relative}
+.gate-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:620px}
+.gate-steps div{border:1px solid var(--deep-line);border-radius:12px;padding:12px;font-size:13px;color:var(--on-deep-muted);background:rgba(255,255,255,.04)}
+.gate-steps b{display:block;color:var(--on-deep);font-family:var(--f-head);font-weight:600;font-size:14px;margin-bottom:2px}
+.gate-form{display:flex;align-items:center;justify-content:center;padding-block:48px;padding-left:24px;padding-right:max(24px,env(safe-area-inset-right,0px))}
+.gate-form .panel{width:100%;max-width:440px;padding:28px}
+.code-input{font-family:var(--f-mono);font-size:18px;letter-spacing:.08em;text-transform:uppercase;text-align:center;direction:ltr}
+.err{color:var(--red);font-size:13px}
+.gate-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.gate-top .lang-btn{border-color:var(--deep-line)}
+
+/* tree */
+.tree-box{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:12px}
+.tree-box svg{display:block}
+.tn rect.bg{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.tn{cursor:pointer}
+.tn:hover rect.bg{stroke:var(--violet)}
+.tn.in rect.bg{stroke:var(--violet);stroke-width:2}
+.tn.sel rect.bg{fill:var(--tint-beat)}
+.tn text{fill:var(--fg);font-family:var(--f-body);font-size:12px}
+.tn text.t{font-family:var(--f-head);font-weight:600;font-size:13px}
+.tn text.s{fill:var(--muted);font-size:11px}
+.tn text.p{fill:var(--violet);font-family:var(--f-mono);font-size:11px;font-weight:500}
+.tn .bar-beat{fill:var(--c-beat)} .tn .bar-lyric{fill:var(--c-lyric)} .tn .bar-melody{fill:var(--c-melody)} .tn .bar-instrument{fill:var(--c-instrument)}
+.edge{fill:none;stroke:var(--line);stroke-width:2}
+.edge.in{stroke:var(--violet);stroke-width:2.5}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+.song-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start}
+.layers{display:flex;flex-direction:column;gap:8px}
+.layer{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.layer.muted-l{opacity:.5}
+.layer .nm{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.layer .sb{font-size:12px;color:var(--muted)}
+.tog{padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);font-size:12px;font-weight:600;cursor:pointer}
+.tog.on{background:var(--fg);color:var(--surface)}
+.split-table{width:100%;border-collapse:collapse;font-size:14px}
+.split-table td{padding:8px 0;border-bottom:1px solid var(--line);vertical-align:middle}
+.split-table td:last-child{text-align:end;font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:500}
+.split-table tr.new td{color:var(--violet);font-weight:600}
+.split-bar{display:flex;height:12px;border-radius:6px;overflow:hidden;gap:2px}
+.split-bar i{display:block;height:100%}
+.note{font-size:13px;color:var(--muted);padding:12px;border-radius:10px;background:var(--surface-2);line-height:1.55}
+.lyrics{white-space:pre-line;direction:rtl;text-align:right;font-size:16px;line-height:2}
+.lyrics-tr{white-space:pre-line;font-size:13px;color:var(--muted);font-style:italic}
+
+/* match */
+.match-grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:16px;align-items:start}
+.crew{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.slot{padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.slot.seed{border-style:dashed}
+.score{display:flex;align-items:center;gap:10px}
+.ring{--p:80;width:52px;height:52px;border-radius:50%;background:conic-gradient(var(--violet) calc(var(--p)*1%),var(--surface-2) 0);display:grid;place-items:center;flex:none}
+.ring b{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:var(--surface);font-family:var(--f-mono);font-size:13px}
+.reasons{display:flex;flex-direction:column;gap:4px;margin:0;padding:0;list-style:none;font-size:13px;color:var(--muted)}
+.reasons li{display:flex;gap:6px;align-items:flex-start}
+.reasons li svg{width:14px;height:14px;color:var(--green);flex:none;margin-top:3px}
+.scan{height:4px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--violet),var(--cyan),transparent);background-size:200% 100%;animation:scan 1s linear infinite}
+@keyframes scan{to{background-position:-200% 0}}
+
+/* A&R */
+.board{display:grid;grid-template-columns:repeat(4,minmax(240px,1fr));gap:14px;overflow-x:auto;padding-bottom:6px}
+.col{display:flex;flex-direction:column;gap:10px;min-width:0}
+.col-head{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 8px;border-bottom:2px solid currentColor}
+.col-head h3{font-size:14px;color:var(--fg)}
+.ar-card{padding:14px;display:flex;flex-direction:column;gap:10px}
+.sig{display:flex;align-items:center;gap:10px}
+.sig .meter{flex:1;height:8px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+.sig .meter i{display:block;height:100%;background:linear-gradient(90deg,#7C3AED,#FF7AB8)}
+.sig b{font-family:var(--f-mono);font-size:14px}
+.kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 12px;font-size:12px;color:var(--muted)}
+.kv b{color:var(--fg);font-family:var(--f-mono);font-weight:500}
+.spark{width:100%;height:30px;display:block}
+.spark path.l{fill:none;stroke:var(--cyan);stroke-width:1.75}
+.spark path.a{fill:var(--tint-melody)}
+.spark circle{fill:var(--cyan)}
+
+/* profile */
+.prof-head{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.tabs button{border:0;background:none;padding:10px 14px;font-weight:600;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button.on{color:var(--fg);border-color:var(--violet)}
+.list{display:flex;flex-direction:column;gap:8px}
+.list-row{display:flex;align-items:center;gap:12px;padding:12px 14px;flex-wrap:wrap}
+.list-row .grow{flex:1;min-width:160px}
+
+/* upload */
+.seg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.seg button{padding:12px 8px;border-radius:12px;border:1px solid var(--line);background:var(--surface);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:600;font-size:13px}
+.seg button svg{width:22px;height:22px}
+.seg button.on{border-color:currentColor;border-width:2px}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:22px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;cursor:pointer;background:var(--surface-2)}
+.drop:hover{border-color:var(--violet)}
+.drop input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
+.proof{font-family:var(--f-mono);font-size:12px;word-break:break-all;padding:12px;border-radius:10px;background:var(--surface-2);direction:ltr;text-align:left}
+.up-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px;align-items:start}
+
+/* player, modal, toast */
+.player{position:fixed;inset:auto 0 0 248px;z-index:30;padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:linear-gradient(90deg,var(--deep-a),var(--deep-b) 60%,var(--deep-c));color:var(--on-deep);display:flex;align-items:center;gap:14px;box-shadow:0 -8px 30px rgba(15,11,36,.25)}
+[dir="rtl"] .player{inset:auto 248px 0 0}
+.app.gate ~ .player{inset-inline:0}
+.player canvas{width:96px;height:32px;flex:none}
+.player .pi{min-width:0;flex:1}
+.player .pi b{display:block;font-family:var(--f-head);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player .pi span{font-size:12px;color:var(--on-deep-muted)}
+.player .icon-btn{background:#fff;color:#24104F;border:0}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(15,11,36,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-box{width:100%;max-width:560px;max-height:calc(100vh - 32px);overflow:auto;background:var(--surface);border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:16px;border:1px solid var(--line)}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:12px;cursor:pointer;text-align:start;background:var(--surface);width:100%}
+.opt:hover,.opt.on{border-color:var(--violet)}
+.opt.on{background:var(--tint-beat)}
+.opt b{display:block;font-size:14px}
+.opt span{font-size:13px;color:var(--muted)}
+.toast{position:fixed;z-index:60;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--surface);padding:12px 18px;border-radius:12px;font-weight:500;font-size:14px;box-shadow:var(--shadow);max-width:calc(100vw - 32px)}
+.demo-flag{font-size:11px;color:var(--on-deep-muted);padding-inline:8px;line-height:1.4}
+
+@media (max-width:1000px){
+  .song-grid,.match-grid,.up-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:860px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{position:fixed;inset:auto 0 0 0;height:auto;z-index:40;flex-direction:row;padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));gap:0}
+  .side .logo,.side .side-foot,.side .side-wave,.side .demo-flag{display:none}
+  .nav{flex-direction:row;width:100%;justify-content:space-between}
+  .nav a{flex-direction:column;gap:3px;padding:6px 4px;font-size:10.5px;flex:1;text-align:center;align-items:center}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:linear-gradient(120deg,var(--deep-a),var(--deep-b) 60%,var(--deep-c));position:sticky;top:env(safe-area-inset-top,0px);z-index:35}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--deep-a)}
+  .player,[dir="rtl"] .player{inset:auto 0 calc(62px + env(safe-area-inset-bottom,0px)) 0;padding-block:8px}
+  main{padding-block:20px 150px}
+  .gate-wrap{grid-template-columns:minmax(0,1fr)}
+  .gate-hero{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));padding-block:32px 120px}
+  .gate-steps{grid-template-columns:minmax(0,1fr)}
+  .grid-2,.grid-3{grid-template-columns:minmax(0,1fr)}
+  .board{grid-template-columns:repeat(4,minmax(250px,80vw))}
+  .band{padding:20px}
+  .stats{gap:18px}
+}
+@media (max-width:520px){ .seg{grid-template-columns:repeat(2,minmax(0,1fr))} .layer{grid-template-columns:auto minmax(0,1fr) auto} .layer .tog{grid-column:3} .layer .icon-btn{display:none} }
+@media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} }
+</style>
+</head>
+<body>
+
+<div class="app gate" id="app">
+  <aside class="side" id="side"></aside>
+  <div style="min-width:0">
+    <div class="topbar" id="topbar"></div>
+    <main id="view"></main>
+  </div>
+</div>
+<div class="player" id="player" hidden>
+  <canvas id="eq" width="192" height="64" aria-hidden="true"></canvas>
+  <div class="pi"><b id="np-title"></b><span id="np-sub"></span></div>
+  <button class="icon-btn" id="np-stop" aria-label="Stop"></button>
+</div>
+<div class="modal" id="modal" hidden><div class="modal-box" id="modal-box" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ---------------- icons ---------------- */
+const IC={
+discover:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>',
+match:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M6 18l2-2M16 8l2-2"/><circle cx="12" cy="12" r="3"/></svg>',
+upload:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>',
+songs:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+ar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.5C16 5 14.3 4.5 12 4.5c-2.8 0-4.5 1.3-4.5 3.3 0 4.7 9.5 2.5 9.5 7.6 0 2.1-1.9 3.6-5 3.6-2.5 0-4.3-.8-5.3-2.5"/></svg>',
+profile:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
+play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>',
+stop:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>',
+heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
+branch:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="8" r="2"/><path d="M6 7v10M18 10c0 4-6 3-12 7"/></svg>',
+check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>',
+x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+swap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>',
+globe:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg>',
+beat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 10v4M8 6v12M12 9v6M16 4v16M20 10v4"/></svg>',
+lyric:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 6h14M5 11h14M5 16h9"/></svg>',
+melody:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 15c3-7 5-7 7 0s4 7 7 0 3-5 4-5"/></svg>',
+instrument:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="9" cy="15" rx="5" ry="6"/><path d="m12.5 10.5 7-7M17 3l4 4"/><circle cx="9" cy="15" r="1.5"/></svg>',
+lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>'
+};
+
+/* ---------------- copy ---------------- */
+const I18N={en:{
+nav_discover:'Discover',nav_match:'AI Match',nav_upload:'Upload',nav_songs:'Songs',nav_ar:'Deals',nav_profile:'Profile',
+lang_other:'العربية',tagline:'Community-built songs',demo_flag:'Prototype with sample creators and synthesized audio.',
+invite_only:'Invite-only beta · UAE & KSA',hero_a:'One song.',hero_b:'Many hands.',
+hero_sub:'Post a beat, a line of lyrics, a melody or an oud riff. AI matches you with the right collaborators, or the community remixes your part into a full song. Everyone on the final version shares the royalties.',
+g1t:'Post a piece',g1:'Beats, lyrics, melodies, instrument parts.',g2t:'Build together',g2:'AI crews or community remix trees.',g3t:'Get signed',g3:'Mixit signs the songs that catch fire.',
+step_invite:'Enter your invite code',step_invite_sub:'Mixit is open to invited creators in the UAE and Saudi Arabia during the beta.',
+invite_hint:'Demo code',continue:'Continue',invite_bad:'That code doesn\'t look right. Codes look like MIXIT-DXB-0412.',
+step_profile:'Set up your creator profile',your_name:'Your name',name_ph:'e.g. Sara Al-Amiri',i_make:'I make',city:'City',dialect:'Dialect you write or sing in',join:'Join Mixit',guest:'Explore as a guest',need_name:'Add your name to continue.',
+t_beat:'Beat',t_lyric:'Lyrics',t_melody:'Melody',t_instrument:'Instrument part',
+tp_beat:'Beats',tp_lyric:'Lyrics',tp_melody:'Melodies',tp_instrument:'Instruments',all:'All',
+i_oud:'Oud',i_qanun:'Qanun',i_perc:'Percussion',i_bass:'Bass',
+d_emirati:'Emirati',d_najdi:'Najdi',d_hijazi:'Hijazi',d_khaliji:'Gulf (Khaliji)',d_any:'Any dialect',
+m_night:'Late night',m_romantic:'Romantic',m_celebration:'Celebration',m_heartbreak:'Heartbreak',m_nostalgia:'Nostalgia',m_energy:'High energy',m_any:'Any mood',
+s_hijaz:'Hijaz',s_bayati:'Bayati',s_rast:'Rast',s_nahawand:'Nahawand',s_kurd:'Kurd',
+hello:'Ahlan',disc_sub:'Fresh pieces from creators in the UAE and Saudi Arabia, and the songs they\'re building.',
+trending:'Songs being built now',see_all:'See all songs',fresh:'Fresh pieces',search_ph:'Search titles or creators',
+use:'Use in a song',bpm:'BPM',versions:'versions',version:'version',contributors:'contributors',likes:'likes',plays:'plays',
+p_ai:'AI matched',p_community:'Community remix',
+st_open:'Open for layers',st_rising:'Rising',st_review:'In review',st_offer:'Offer sent',st_signed:'Signed',
+use_title:'Use this piece',use_new:'Start a new song with it',use_new_sub:'Your piece becomes the root. Others add layers on top.',
+use_ai:'Find a crew with AI',use_ai_sub:'AI picks the parts that fit this piece best.',use_add:'Add it to a song in progress',use_add_sub:'Pick a song and the version to layer onto.',
+pick_song:'Song',pick_version:'Version to build on',go:'Continue',cancel:'Cancel',close:'Close',
+match_title:'AI Match',match_sub:'Pick a starting piece. The matcher looks at key, maqam, tempo, dialect and mood, and proposes a crew to finish the song.',
+start_from:'Start from',target_d:'Target dialect',target_m:'Target mood',find_crew:'Find my crew',finding:'Listening to the catalog and ranking matches…',
+crew:'Proposed crew',seed:'Your starting piece',swap:'Swap',preview_all:'Play crew together',start_song:'Start song with this crew',
+r_key:'Same key and maqam',r_scale:'Same maqam',r_dialect:'Dialect matches',r_mood:'Mood matches',r_bpm:'Tempo fits',r_city:'Same country, easier sessions',r_pop:'Strong listener response',
+proposed_split:'Proposed royalty split',split_note:'Every creator on the crew accepts this split before the song opens. You can change shares before you send.',
+send_invites:'Send crew invites',
+up_title:'Upload a piece',up_sub:'Your piece is hashed and timestamped the moment you post it, so authorship is always provable.',
+type:'Type',title:'Title',title_ph:'Give it a name',file:'Audio file',file_drop:'Drop an audio file or click to choose',file_none:'No file? We\'ll make a sketch so you can try the flow.',
+lyrics_lbl:'Lyrics',lyrics_ph:'اكتب كلماتك هنا…',key:'Key',maqam:'Maqam / scale',inst:'Instrument',mood:'Mood',
+open_to:'Open to',o_both:'AI matching and remixes',o_remix:'Community remixes only',o_ai:'AI matching only',
+min_share:'Smallest share you\'ll accept when your piece is used',own:'I made this and I own the rights to it.',post:'Post piece',
+posted:'Posted. Proof of creation saved.',proof:'Proof of creation',find_for:'Find a crew for it',view_feed:'See it in Discover',
+up_side_t:'How you get paid',up_side:'When your piece goes into a song, you agree a share before it\'s added. If the song is signed, that share of the creator pool is yours. Each new layer dilutes earlier shares in proportion, and everyone sees the split before agreeing.',
+up_rules:'You keep ownership until you sign a deal for a specific song. Artists hear watermarked previews only.',
+songs_title:'Songs',songs_sub:'Every song is a tree. Each branch is a version someone built by adding a layer.',
+tree:'Contribution tree',tree_hint:'Select any node to hear that version. Add a layer to branch from it.',
+layers:'Layers in this version',mute:'Mute',on:'On',split_title:'Royalty split for this version',
+split_explain:'Each layer\'s share was agreed before it was added. Earlier contributors were diluted in proportion. Label terms are set at signing.',
+add_layer:'Add a layer here',like_version:'Like this version',play_version:'Play version',lead:'Most liked',
+add_title:'Add your layer',add_sub:'Your layer branches from the version you selected. The people before you keep their relative shares.',
+choose_piece:'Choose one of your pieces',or_new:'Or sketch a new part',new_title_ph:'Name your part',share_ask:'Your share of this version',
+agree:'I agree to this split. Earlier contributors are notified and their terms stay as agreed.',add_btn:'Add layer',
+added:'Layer added. Earlier contributors were notified of the new split.',no_pieces:'You haven\'t uploaded anything yet. Sketch a part below.',
+root:'Root',you:'You',
+ar_title:'Deals',ar_sub:'Likes are one signal. Plays, remix activity, growth and completeness count too, and Mixit makes the final call.',
+signal:'Signal',growth:'7-day growth',adv_review:'Start review',adv_offer:'Send offer',adv_signed:'Mark signed',pass:'Pass',listen:'Listen',
+offer_title:'Send a signing offer',offer_sub:'The offer goes to every contributor on the lead version. Each one accepts before the deal closes.',
+label_share:'Label share of master revenue',label_ph:'placeholder, not decided',creator_pool:'Creator pool',advance:'Advance (AED)',send_offer:'Send offer',
+offer_sent:'Offer sent to contributors.',moved:'Moved to',signed_t:'Signed to Mixit Bil Arabi.',passed:'Passed. The song stays open for layers.',
+prof_pieces:'Pieces',prof_songs:'Songs on',prof_likes:'Likes received',prof_share:'Avg. share',
+your_share:'Share',reset:'Reset demo data',reset_done:'Demo data reset.',joined:'Joined',
+guest_name:'Guest creator',new_creator:'New to Mixit',
+empty_pieces:'Nothing here yet.',upload_first:'Upload your first piece',
+crew_started:'Song started. Crew invites sent.',song_started:'Song started. Others can now add layers.',
+liked:'Liked',lyrics_head:'Lyrics',translation:'Translation'
+},ar:{
+nav_discover:'اكتشف',nav_match:'مطابقة ذكية',nav_upload:'ارفع',nav_songs:'الأغاني',nav_ar:'الصفقات',nav_profile:'ملفي',
+lang_other:'English',tagline:'أغانٍ يبنيها المجتمع',demo_flag:'نموذج أولي ببيانات وأصوات تجريبية.',
+invite_only:'نسخة تجريبية بالدعوة · الإمارات والسعودية',hero_a:'أغنية وحدة.',hero_b:'أيادي كثيرة.',
+hero_sub:'انشر إيقاع، أو سطر كلمات، أو لحن، أو تقسيمة عود. الذكاء الاصطناعي يجمعك بالمتعاونين المناسبين، أو المجتمع يبني على جزئك لين تكتمل الأغنية. كل من شارك في النسخة النهائية له نصيب من العوائد.',
+g1t:'انشر جزء',g1:'إيقاعات، كلمات، ألحان، آلات.',g2t:'ابنوا مع بعض',g2:'فرق بالذكاء الاصطناعي أو شجرة ريمكسات.',g3t:'وقّع مع اللابل',g3:'ميكسِت يوقّع الأغاني اللي تنتشر.',
+step_invite:'أدخل رمز الدعوة',step_invite_sub:'ميكسِت متاح خلال الفترة التجريبية للمبدعين المدعوين في الإمارات والسعودية.',
+invite_hint:'رمز تجريبي',continue:'متابعة',invite_bad:'الرمز غير صحيح. الرموز تكون بهذا الشكل MIXIT-DXB-0412.',
+step_profile:'جهّز ملفك كمبدع',your_name:'اسمك',name_ph:'مثلاً سارة العامري',i_make:'أصنع',city:'المدينة',dialect:'اللهجة اللي تكتب أو تغني فيها',join:'انضم لميكسِت',guest:'تصفّح كضيف',need_name:'أضف اسمك للمتابعة.',
+t_beat:'إيقاع',t_lyric:'كلمات',t_melody:'لحن',t_instrument:'آلة',
+tp_beat:'إيقاعات',tp_lyric:'كلمات',tp_melody:'ألحان',tp_instrument:'آلات',all:'الكل',
+i_oud:'عود',i_qanun:'قانون',i_perc:'إيقاع شعبي',i_bass:'باص',
+d_emirati:'إماراتي',d_najdi:'نجدي',d_hijazi:'حجازي',d_khaliji:'خليجي',d_any:'أي لهجة',
+m_night:'سهرة',m_romantic:'رومانسي',m_celebration:'فرح',m_heartbreak:'فراق',m_nostalgia:'حنين',m_energy:'حماس',m_any:'أي مزاج',
+s_hijaz:'حجاز',s_bayati:'بياتي',s_rast:'راست',s_nahawand:'نهاوند',s_kurd:'كرد',
+hello:'أهلاً',disc_sub:'أجزاء جديدة من مبدعين في الإمارات والسعودية، والأغاني اللي يبنونها.',
+trending:'أغاني قيد البناء الحين',see_all:'كل الأغاني',fresh:'أجزاء جديدة',search_ph:'ابحث بالعنوان أو المبدع',
+use:'استخدمه في أغنية',bpm:'نبضة/د',versions:'نسخ',version:'نسخة',contributors:'مشاركين',likes:'إعجاب',plays:'استماع',
+p_ai:'مطابقة ذكية',p_community:'ريمكس المجتمع',
+st_open:'مفتوحة للإضافة',st_rising:'صاعدة',st_review:'قيد المراجعة',st_offer:'تم إرسال عرض',st_signed:'موقّعة',
+use_title:'استخدم هذا الجزء',use_new:'ابدأ أغنية جديدة فيه',use_new_sub:'جزءك يصير الأساس، والباقين يضيفون عليه.',
+use_ai:'كوّن فريق بالذكاء الاصطناعي',use_ai_sub:'الذكاء الاصطناعي يختار الأجزاء الأنسب لهذا الجزء.',use_add:'أضفه لأغنية قيد البناء',use_add_sub:'اختر الأغنية والنسخة اللي تبني عليها.',
+pick_song:'الأغنية',pick_version:'النسخة اللي تبني عليها',go:'متابعة',cancel:'إلغاء',close:'إغلاق',
+match_title:'المطابقة الذكية',match_sub:'اختر جزء تبدأ فيه. نظام المطابقة يقرأ المقام والطبقة والسرعة واللهجة والمزاج، ويقترح فريق يكمّل الأغنية.',
+start_from:'ابدأ من',target_d:'اللهجة المطلوبة',target_m:'المزاج المطلوب',find_crew:'كوّن فريقي',finding:'نسمع المكتبة ونرتّب أفضل التطابقات…',
+crew:'الفريق المقترح',seed:'جزءك الأساسي',swap:'بدّل',preview_all:'شغّل الفريق مع بعض',start_song:'ابدأ الأغنية بهذا الفريق',
+r_key:'نفس الطبقة والمقام',r_scale:'نفس المقام',r_dialect:'اللهجة متطابقة',r_mood:'المزاج متطابق',r_bpm:'السرعة مناسبة',r_city:'نفس البلد، الجلسات أسهل',r_pop:'تفاعل قوي من المستمعين',
+proposed_split:'تقسيم العوائد المقترح',split_note:'كل مبدع في الفريق يوافق على هذا التقسيم قبل ما تنفتح الأغنية. تقدر تعدّل النسب قبل الإرسال.',
+send_invites:'أرسل دعوات الفريق',
+up_title:'ارفع جزء',up_sub:'جزءك يُختم بتوقيع رقمي ووقت النشر لحظة رفعه، عشان تقدر تثبت ملكيتك دايماً.',
+type:'النوع',title:'العنوان',title_ph:'سمّه',file:'ملف صوتي',file_drop:'اسحب ملف صوتي أو اضغط للاختيار',file_none:'ما عندك ملف؟ بنسوي لك مسودة تجرب فيها.',
+lyrics_lbl:'الكلمات',lyrics_ph:'اكتب كلماتك هنا…',key:'الطبقة',maqam:'المقام',inst:'الآلة',mood:'المزاج',
+open_to:'متاح لـ',o_both:'المطابقة الذكية والريمكسات',o_remix:'ريمكسات المجتمع فقط',o_ai:'المطابقة الذكية فقط',
+min_share:'أقل نسبة تقبلها لما يُستخدم جزءك',own:'أنا صنعت هذا الجزء وأملك حقوقه.',post:'انشر الجزء',
+posted:'تم النشر. حُفظ إثبات الملكية.',proof:'إثبات الملكية',find_for:'كوّن له فريق',view_feed:'شوفه في اكتشف',
+up_side_t:'كيف تحصل على عوائدك',up_side:'لما يدخل جزءك في أغنية، تتفق على نسبتك قبل الإضافة. إذا تم توقيع الأغنية، هذي النسبة من حصة المبدعين لك. كل طبقة جديدة تخفّض النسب السابقة بالتناسب، والكل يشوف التقسيم قبل ما يوافق.',
+up_rules:'تبقى مالك لجزءك لين توقّع عقد لأغنية معيّنة. الفنانين يسمعون نسخ معلّمة فقط.',
+songs_title:'الأغاني',songs_sub:'كل أغنية شجرة، وكل فرع نسخة بناها أحد بإضافة طبقة.',
+tree:'شجرة المشاركات',tree_hint:'اختر أي عقدة عشان تسمع نسختها. أضف طبقة عشان تتفرّع منها.',
+layers:'طبقات هذي النسخة',mute:'كتم',on:'شغّال',split_title:'تقسيم العوائد لهذي النسخة',
+split_explain:'نسبة كل طبقة تم الاتفاق عليها قبل إضافتها، والمشاركين قبلها انخفضت نسبهم بالتناسب. شروط اللابل تتحدد عند التوقيع.',
+add_layer:'أضف طبقة هنا',like_version:'أعجبتني هذي النسخة',play_version:'شغّل النسخة',lead:'الأكثر إعجاباً',
+add_title:'أضف طبقتك',add_sub:'طبقتك تتفرّع من النسخة اللي اخترتها. اللي قبلك يحتفظون بنسبهم النسبية.',
+choose_piece:'اختر جزء من أجزائك',or_new:'أو سوّ مسودة جزء جديد',new_title_ph:'سمّ جزءك',share_ask:'نسبتك من هذي النسخة',
+agree:'أوافق على هذا التقسيم. المشاركين السابقين يوصلهم إشعار وشروطهم تبقى مثل ما اتفقوا.',add_btn:'أضف الطبقة',
+added:'تمت إضافة الطبقة. وصل إشعار بالتقسيم الجديد للمشاركين السابقين.',no_pieces:'ما رفعت شي للحين. سوّ مسودة جزء تحت.',
+root:'الأساس',you:'أنت',
+ar_title:'الصفقات',ar_sub:'الإعجابات مؤشر واحد. الاستماع ونشاط الريمكس والنمو واكتمال الأغنية تُحسب كذلك، والقرار الأخير لميكسِت.',
+signal:'المؤشر',growth:'نمو ٧ أيام',adv_review:'ابدأ المراجعة',adv_offer:'أرسل عرض',adv_signed:'تم التوقيع',pass:'تجاوز',listen:'استمع',
+offer_title:'إرسال عرض توقيع',offer_sub:'العرض يوصل لكل المشاركين في النسخة الأكثر إعجاباً، وكل واحد يوافق قبل إتمام الصفقة.',
+label_share:'حصة اللابل من عوائد التسجيل',label_ph:'مؤقت، لم يُحدد',creator_pool:'حصة المبدعين',advance:'دفعة مقدمة (درهم)',send_offer:'أرسل العرض',
+offer_sent:'تم إرسال العرض للمشاركين.',moved:'انتقلت إلى',signed_t:'تم التوقيع مع ميكسِت بالعربي.',passed:'تم التجاوز. الأغنية تبقى مفتوحة للإضافة.',
+prof_pieces:'الأجزاء',prof_songs:'أغاني شارك فيها',prof_likes:'الإعجابات',prof_share:'متوسط النسبة',
+your_share:'النسبة',reset:'إعادة ضبط البيانات التجريبية',reset_done:'تمت إعادة الضبط.',joined:'انضم',
+guest_name:'مبدع ضيف',new_creator:'جديد على ميكسِت',
+empty_pieces:'ما فيه شي هنا للحين.',upload_first:'ارفع أول جزء',
+crew_started:'بدأت الأغنية وتم إرسال دعوات الفريق.',song_started:'بدأت الأغنية. الحين يقدر غيرك يضيف طبقات.',
+liked:'تم الإعجاب',lyrics_head:'الكلمات',translation:'الترجمة'
+}};
+
+/* ---------------- seed data ---------------- */
+const CITIES={dubai:{en:'Dubai',ar:'دبي',cc:'AE'},abudhabi:{en:'Abu Dhabi',ar:'أبوظبي',cc:'AE'},sharjah:{en:'Sharjah',ar:'الشارقة',cc:'AE'},riyadh:{en:'Riyadh',ar:'الرياض',cc:'SA'},jeddah:{en:'Jeddah',ar:'جدة',cc:'SA'},dammam:{en:'Dammam',ar:'الدمام',cc:'SA'}};
+const TYPES=['beat','lyric','melody','instrument'];
+const DIALECTS=['emirati','najdi','hijazi','khaliji'];
+const MOODS=['night','romantic','celebration','heartbreak','nostalgia','energy'];
+const KEYS={C:130.81,D:146.83,E:164.81,F:174.61,G:196.00,A:220.00};
+/* maqam scales in semitones; Bayati and Rast carry real quarter tones */
+const SCALES={hijaz:[0,1,4,5,7,8,10],bayati:[0,1.5,3,5,7,8,10],rast:[0,2,3.5,5,7,9,10.5],nahawand:[0,2,3,5,7,8,11],kurd:[0,1,3,5,7,8,10]};
+const HUES=['#7C3AED','#DB2777','#0891B2','#C2410C','#4F46E5','#0D9488','#9333EA','#BE185D','#0369A1'];
+
+const SEED_CREATORS={
+c1:{name:{en:'Noura Al-Mansoori',ar:'نورة المنصوري'},city:'dubai',roles:['beat'],hue:0,bio:{en:'Khaliji trap and R&B producer. Drums that leave room for a mawwal.',ar:'منتجة خليجي تراب وآر أند بي. إيقاعات تترك مساحة للموّال.'},joined:'2026-10-02'},
+c2:{name:{en:'Faisal Al-Qahtani',ar:'فيصل القحطاني'},city:'riyadh',roles:['lyric'],hue:1,bio:{en:'Writes in Najdi dialect. Nabati poetry roots, pop hooks.',ar:'يكتب باللهجة النجدية. جذور نبطية وهوكات بوب.'},joined:'2026-10-04'},
+c3:{name:{en:'Reem Haddad',ar:'ريم حداد'},city:'abudhabi',roles:['melody'],hue:2,bio:{en:'Topliner. Hijaz and Nahawand hooks that stick.',ar:'ملحّنة توب لاين. هوكات حجاز ونهاوند تعلق بالذاكرة.'},joined:'2026-10-05'},
+c4:{name:{en:'Omar Bakr',ar:'عمر بكر'},city:'jeddah',roles:['instrument'],hue:3,bio:{en:'Oud and qanun. Session player for Hijazi and Khaliji records.',ar:'عازف عود وقانون. يعزف في تسجيلات حجازية وخليجية.'},joined:'2026-10-06'},
+c5:{name:{en:'Dana Al-Shehhi',ar:'دانة الشحي'},city:'sharjah',roles:['beat'],hue:4,bio:{en:'Afro-Khaliji and Gulf garage producer.',ar:'منتجة أفرو خليجي وقراج خليجي.'},joined:'2026-10-09'},
+c6:{name:{en:'Yousef Al-Harbi',ar:'يوسف الحربي'},city:'dammam',roles:['instrument'],hue:5,bio:{en:'Mirwas, tabl and hand claps. The Gulf groove section.',ar:'مرواس وطبل وتصفيق. قسم الإيقاع الخليجي.'},joined:'2026-10-11'},
+c7:{name:{en:'Lina Saeed',ar:'لينا سعيد'},city:'riyadh',roles:['melody'],hue:6,bio:{en:'Vocalist and topliner. Writes choruses for Saudi pop.',ar:'مغنية وملحنة. تكتب كورسات للبوب السعودي.'},joined:'2026-10-12'},
+c8:{name:{en:'Khalid Rashed',ar:'خالد راشد'},city:'dubai',roles:['lyric'],hue:7,bio:{en:'Emirati lyricist. Sea, night and home.',ar:'شاعر غنائي إماراتي. البحر والليل والبيت.'},joined:'2026-10-15'}
+};
+
+const SEED_PIECES=[
+{id:'p1',type:'beat',style:'trap',by:'c1',title:{en:'Desert Drive',ar:'درب الصحراء'},bpm:92,key:'D',scale:'hijaz',dialect:'khaliji',mood:['night','energy'],seed:11,likes:1840,plays:22100,date:'2026-10-20'},
+{id:'p2',type:'lyric',by:'c2',title:{en:'Ya Leil Al Riyadh',ar:'يا ليل الرياض'},bpm:92,key:'D',scale:'hijaz',dialect:'najdi',mood:['night','romantic'],seed:21,likes:2210,plays:15400,date:'2026-10-22',
+ lyrics:{ar:'يا ليل الرياض طوّل شوي\nخلّ القلب يحكي اللي فيه\nالشوق جاني من غير موعد\nوأنا على وعدك أستنّيه',en:'Riyadh night, stay a little longer\nLet the heart say what it holds\nLonging came without a warning\nAnd I\'m still waiting on your word'}},
+{id:'p3',type:'melody',by:'c3',title:{en:'Hijaz Hook',ar:'هوك حجاز'},bpm:92,key:'D',scale:'hijaz',dialect:'khaliji',mood:['night','heartbreak'],seed:31,likes:3120,plays:30200,date:'2026-10-24'},
+{id:'p4',type:'instrument',inst:'oud',by:'c4',title:{en:'Sunset Oud Riff',ar:'تقسيمة الغروب'},bpm:92,key:'D',scale:'bayati',dialect:'hijazi',mood:['nostalgia','romantic'],seed:41,likes:1960,plays:18800,date:'2026-10-25'},
+{id:'p5',type:'beat',style:'afro',by:'c5',title:{en:'Corniche Bounce',ar:'بونس الكورنيش'},bpm:104,key:'A',scale:'nahawand',dialect:'emirati',mood:['celebration','energy'],seed:51,likes:1320,plays:14100,date:'2026-10-27'},
+{id:'p6',type:'instrument',inst:'perc',by:'c6',title:{en:'Mirwas Groove',ar:'إيقاع المرواس'},bpm:104,key:'A',scale:'nahawand',dialect:'khaliji',mood:['celebration'],seed:61,likes:1100,plays:9700,date:'2026-10-28'},
+{id:'p7',type:'melody',by:'c7',title:{en:'Najdi Chorus',ar:'كورس نجدي'},bpm:104,key:'A',scale:'nahawand',dialect:'najdi',mood:['celebration','romantic'],seed:71,likes:1580,plays:12900,date:'2026-10-30'},
+{id:'p8',type:'lyric',by:'c8',title:{en:'Shams w Gamar',ar:'شمس وقمر'},bpm:104,key:'A',scale:'nahawand',dialect:'emirati',mood:['romantic','celebration'],seed:81,likes:1240,plays:8800,date:'2026-11-01',
+ lyrics:{ar:'إنتي الشمس وأنا القمر\nنلتقي بس وقت السهر\nلا تقولين المسافة بعيدة\nالقلب يقرّبها لو كبر',en:'You\'re the sun and I\'m the moon\nWe only meet when the night runs late\nDon\'t tell me the distance is too far\nThe heart closes it when it grows'}},
+{id:'p9',type:'beat',style:'rnb',by:'c1',title:{en:'Midnight Majlis',ar:'مجلس منتصف الليل'},bpm:84,key:'E',scale:'kurd',dialect:'khaliji',mood:['night','romantic'],seed:91,likes:760,plays:6100,date:'2026-11-03'},
+{id:'p10',type:'instrument',inst:'qanun',by:'c4',title:{en:'Qanun Glide',ar:'انسياب القانون'},bpm:84,key:'E',scale:'kurd',dialect:'hijazi',mood:['nostalgia'],seed:101,likes:540,plays:4200,date:'2026-11-05'},
+{id:'p11',type:'melody',by:'c7',title:{en:'Majlis Whisper',ar:'همس المجلس'},bpm:84,key:'E',scale:'kurd',dialect:'najdi',mood:['night','heartbreak'],seed:111,likes:610,plays:5100,date:'2026-11-07'},
+{id:'p12',type:'lyric',by:'c8',title:{en:'Ana Wiyak',ar:'أنا وياك'},bpm:84,key:'E',scale:'kurd',dialect:'emirati',mood:['night','romantic'],seed:121,likes:690,plays:4800,date:'2026-11-08',
+ lyrics:{ar:'أنا وياك والليل ثالثنا\nوالبحر يسمع سالفتنا\nلو تبعد الدنيا عن دربنا\nيبقى الهوى بيتنا',en:'You and me, and the night makes three\nThe sea is listening to our story\nIf the world pulls away from our road\nLove stays our home'}},
+{id:'p13',type:'beat',style:'khaleeji',by:'c5',title:{en:'Ghaib Groove',ar:'إيقاع غايب'},bpm:98,key:'G',scale:'rast',dialect:'khaliji',mood:['heartbreak','nostalgia'],seed:131,likes:980,plays:9900,date:'2026-11-10'},
+{id:'p14',type:'lyric',by:'c2',title:{en:'Ghaib',ar:'غايب'},bpm:98,key:'G',scale:'rast',dialect:'najdi',mood:['heartbreak','nostalgia'],seed:141,likes:1420,plays:11200,date:'2026-11-11',
+ lyrics:{ar:'غايب وطيفك ما غاب\nساكن عيوني والأحباب\nكل ما قلت أنساك يا زين\nرجّعني صوتك للباب',en:'You\'re gone, but your shadow never left\nIt lives in my eyes and with my people\nEvery time I say I\'ll forget you\nYour voice brings me back to the door'}},
+{id:'p15',type:'instrument',inst:'bass',by:'c5',title:{en:'Gulf Sub Line',ar:'باص خليجي'},bpm:98,key:'G',scale:'rast',dialect:'khaliji',mood:['night','energy'],seed:151,likes:420,plays:3300,date:'2026-11-14'},
+{id:'p16',type:'melody',by:'c3',title:{en:'Rast Morning',ar:'صباح راست'},bpm:98,key:'G',scale:'rast',dialect:'emirati',mood:['nostalgia','celebration'],seed:161,likes:380,plays:2900,date:'2026-11-16'}
+];
+
+const SEED_SONGS=[
+{id:'s1',title:{en:'Ya Leil Al Riyadh',ar:'يا ليل الرياض'},path:'community',stage:'review',plays:61200,growth:[3.1,3.4,3.9,4.6,5.2,6.4,7.9],date:'2026-10-22',
+ nodes:[{id:'n1',piece:'p1',parent:null,share:1,likes:620},{id:'n2',piece:'p2',parent:'n1',share:.3,likes:910},{id:'n3',piece:'p3',parent:'n2',share:.25,likes:2050},{id:'n4',piece:'p4',parent:'n3',share:.15,likes:2480},{id:'n5',piece:'p6',parent:'n2',share:.15,likes:640},{id:'n6',piece:'p15',parent:'n3',share:.1,likes:390}]},
+{id:'s2',title:{en:'Shams w Gamar',ar:'شمس وقمر'},path:'ai',stage:'rising',plays:24800,growth:[1.2,1.5,1.9,2.6,3.1,3.8,4.9],date:'2026-11-02',
+ nodes:[{id:'n1',piece:'p5',parent:null,share:1,likes:380},{id:'n2',piece:'p8',parent:'n1',share:.3,likes:520},{id:'n3',piece:'p7',parent:'n2',share:.25,likes:860},{id:'n4',piece:'p6',parent:'n3',share:.12,likes:1190}]},
+{id:'s3',title:{en:'Ana Wiyak',ar:'أنا وياك'},path:'community',stage:'open',plays:7300,growth:[.4,.5,.5,.7,.8,.8,1.1],date:'2026-11-08',
+ nodes:[{id:'n1',piece:'p9',parent:null,share:1,likes:210},{id:'n2',piece:'p10',parent:'n1',share:.2,likes:240},{id:'n3',piece:'p12',parent:'n1',share:.3,likes:330},{id:'n4',piece:'p11',parent:'n3',share:.25,likes:520}]},
+{id:'s4',title:{en:'Ghaib',ar:'غايب'},path:'ai',stage:'signed',plays:88400,growth:[6.2,6.8,7.1,7.9,8.4,9.0,9.6],date:'2026-11-11',
+ nodes:[{id:'n1',piece:'p13',parent:null,share:1,likes:900},{id:'n2',piece:'p14',parent:'n1',share:.3,likes:1700},{id:'n3',piece:'p16',parent:'n2',share:.25,likes:2300},{id:'n4',piece:'p4',parent:'n3',share:.15,likes:3650}]}
+];
+
+/* ---------------- state ---------------- */
+const STORE='mixit-proto-v1';
+let S;
+function fresh(){return{lang:'en',me:null,pieces:JSON.parse(JSON.stringify(SEED_PIECES)),songs:JSON.parse(JSON.stringify(SEED_SONGS)),liked:[],sel:{},filter:{type:'all',dialect:'any',mood:'any',q:''},tab:'pieces'}}
+function load(){try{const raw=localStorage.getItem(STORE);if(raw){const d=JSON.parse(raw);S=Object.assign(fresh(),d);return}}catch(e){}S=fresh()}
+function save(){try{const c=Object.assign({},S,{pieces:S.pieces.map(p=>{const q=Object.assign({},p);delete q.fileUrl;return q})});localStorage.setItem(STORE,JSON.stringify(c))}catch(e){}}
+load();
+const FILES={}; // object URLs for uploaded audio, this session only
+
+/* ---------------- helpers ---------------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const T=k=>(I18N[S.lang]&&I18N[S.lang][k])??I18N.en[k]??k;
+const L=o=>o?(typeof o==='string'?o:(o[S.lang]||o.en)):'';
+const loc=()=>S.lang==='ar'?'ar-AE-u-nu-latn':'en-US';
+const n=v=>new Intl.NumberFormat(loc(),{notation:v>=10000?'compact':'standard',maximumFractionDigits:1}).format(v);
+const pct=v=>new Intl.NumberFormat(loc(),{style:'percent',maximumFractionDigits:1}).format(v);
+const dateF=d=>new Intl.DateTimeFormat(loc(),{day:'numeric',month:'short'}).format(new Date(d));
+function creators(){const c=Object.assign({},SEED_CREATORS);if(S.me)c.me={name:{en:S.me.name,ar:S.me.name},city:S.me.city,roles:S.me.roles,hue:8,bio:{en:T('new_creator'),ar:I18N.ar.new_creator},joined:S.me.joined};return c}
+const C=id=>creators()[id]||{name:{en:'?'},city:'dubai',roles:[],hue:0};
+const P=id=>S.pieces.find(p=>p.id===id);
+const SG=id=>S.songs.find(s=>s.id===id);
+function initials(name){return name.split(/[\s-]+/).filter(Boolean).slice(0,2).map(w=>w.replace(/^ال(?=..)/,'')[0]).join('').toUpperCase()}
+function av(id,cls=''){const c=C(id);return `<span class="av ${cls}" style="background:${HUES[c.hue%HUES.length]}" title="${esc(L(c.name))}">${esc(initials(L(c.name)))}</span>`}
+function typeLabel(p){return p.type==='instrument'&&p.inst?T('i_'+p.inst):T('t_'+p.type)}
+function tag(p){return `<span class="tag ${p.type}">${typeLabel(p)}</span>`}
+function metaLine(p){return `${p.bpm} ${T('bpm')} · ${p.key} ${T('s_'+p.scale)} · ${T('d_'+p.dialect)}`}
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function waveBars(seed,count=46){const r=mulberry(seed*7+3);let out='';for(let i=0;i<count;i++){const env=Math.sin(Math.PI*i/count)*.6+.4;const h=Math.max(10,Math.round((r()*.7+.3)*env*100));out+=`<i style="height:${h}%"></i>`}return `<div class="wave">${out}</div>`}
+function isLiked(k){return S.liked.includes(k)}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,3200)}
+function stagePill(st){return `<span class="pill st-${st}"><span class="dot"></span>${T('st_'+st)}</span>`}
+function pathTag(p){return `<span class="tag plain">${p==='ai'?IC.match.replace('<svg','<svg width="13" height="13"'):IC.branch.replace('<svg','<svg width="13" height="13"')}${T('p_'+p)}</span>`}
+
+/* song maths */
+function pathTo(song,nodeId){const out=[];let cur=song.nodes.find(x=>x.id===nodeId);while(cur){out.unshift(cur);cur=song.nodes.find(x=>x.id===cur.parent)}return out}
+function splits(path){let arr=[];path.forEach((nd,i)=>{const p=P(nd.piece);if(i===0){arr=[{node:nd.id,by:p.by,piece:p.id,pct:1}]}else{arr.forEach(a=>a.pct*=(1-nd.share));arr.push({node:nd.id,by:p.by,piece:p.id,pct:nd.share})}});return arr}
+function leadNode(song){return song.nodes.reduce((a,b)=>b.likes>=a.likes?b:a)}
+function songLikes(song){return song.nodes.reduce((s,x)=>s+x.likes+(isLiked(song.id+':'+x.id)?1:0),0)}
+function songCreators(song){return [...new Set(song.nodes.map(x=>P(x.piece).by))]}
+function signal(song){
+  const likes=songLikes(song),lead=pathTo(song,leadNode(song).id),types=new Set(lead.map(x=>P(x.piece).type));
+  const g=song.growth,gr=g[0]?(g[g.length-1]-g[0])/g[0]:0;
+  const parts={likes:Math.min(35,Math.log10(likes+1)*9),plays:Math.min(20,Math.log10(song.plays+1)*4),remix:Math.min(15,song.nodes.length*2.5),growth:Math.min(15,gr*10),complete:(types.has('beat')&&types.has('lyric')&&types.has('melody'))?15:types.size*4};
+  const total=Math.round(Object.values(parts).reduce((a,b)=>a+b,0));
+  return{total:Math.min(99,total),gr,parts};
+}
+
+/* ---------------- audio engine ---------------- */
+const Engine=(()=>{
+  let ctx,master,analyser,noiseBuf,timer=null,session=null,cur=null;
+  function init(){
+    if(ctx)return;
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const comp=ctx.createDynamicsCompressor();comp.threshold.value=-14;comp.ratio.value=4;
+    master=ctx.createGain();master.gain.value=.7;master.connect(comp);
+    analyser=ctx.createAnalyser();analyser.fftSize=64;analyser.smoothingTimeConstant=.75;
+    comp.connect(analyser);analyser.connect(ctx.destination);
+    noiseBuf=ctx.createBuffer(1,ctx.sampleRate,ctx.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  }
+  function env(g,t,a,peak,d){g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+a+d)}
+  function kick(t,dest,v=.9,f0=150,f1=42,d=.28){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+.13);env(g,t,.002,v,d);o.connect(g).connect(dest);o.start(t);o.stop(t+d+.1)}
+  function noise(t,dest,{type='highpass',f=7000,q=1,v=.2,d=.04}={}){const s=ctx.createBufferSource();s.buffer=noiseBuf;const fl=ctx.createBiquadFilter();fl.type=type;fl.frequency.value=f;fl.Q.value=q;const g=ctx.createGain();env(g,t,.001,v,d);s.connect(fl).connect(g).connect(dest);s.start(t,Math.random()*.5);s.stop(t+d+.05)}
+  function tone(t,freq,dur,dest,{wave='sine',v=.15,a=.005,cut=0,cutEnd=0,vib=0,q=1}={}){
+    const o=ctx.createOscillator();o.type=wave;o.frequency.setValueAtTime(freq,t);let node=o;
+    if(vib){const l=ctx.createOscillator(),lg=ctx.createGain();l.frequency.value=5.4;lg.gain.setValueAtTime(0,t);lg.gain.linearRampToValueAtTime(vib,t+Math.min(.25,dur));l.connect(lg).connect(o.frequency);l.start(t);l.stop(t+a+dur+.1)}
+    if(cut){const f=ctx.createBiquadFilter();f.type='lowpass';f.Q.value=q;f.frequency.setValueAtTime(cut,t);if(cutEnd)f.frequency.exponentialRampToValueAtTime(cutEnd,t+dur);o.connect(f);node=f}
+    const g=ctx.createGain();env(g,t,a,v,dur);node.connect(g).connect(dest);o.start(t);o.stop(t+a+dur+.1);
+  }
+  const freqOf=(root,scale,deg)=>{const s=SCALES[scale]||SCALES.hijaz;const o=Math.floor(deg/7),i=((deg%7)+7)%7;return root*Math.pow(2,(s[i]+12*o)/12)};
+  function phrase(seed,density,maxLen=3,range=7){
+    const r=mulberry(seed);const bar=[];let st=0;
+    while(st<16){if(r()<density){const len=1+Math.floor(r()*maxLen);bar.push({step:st,deg:Math.floor(r()*range)-1,len});st+=len}else st++}
+    const second=bar.map(x=>Object.assign({},x,{step:x.step+16})).filter(x=>x.step<28);
+    second.push({step:28,deg:0,len:4});
+    return bar.concat(second);
+  }
+  const BEATS={
+    trap:{k:[0,7,10,16,23,26],s:[8,24],h:'2',roll:true,bass:true},
+    afro:{k:[0,6,10,16,22,26],s:[],rim:[4,12,20,28,14],h:'off',shaker:true,bass:true},
+    rnb:{k:[0,10,16,19,26],s:[8,24],h:'2soft',bass:true},
+    khaleeji:{k:[0,6,10,16,22,26],s:[],clap:[4,12,14,20,28,30],h:'2soft',bass:true},
+  };
+  /* each layer: schedule one 2-bar loop (32 sixteenths) at t0 */
+  function layer(p,t0,sd,root,scale,dest){
+    if(p.type==='beat'){
+      const b=BEATS[p.style]||BEATS.trap;
+      b.k.forEach(s=>{kick(t0+s*sd,dest);if(b.bass)tone(t0+s*sd,root/2,sd*2.6,dest,{wave:'sine',v:.32,a:.004})});
+      (b.s||[]).forEach(s=>{noise(t0+s*sd,dest,{type:'bandpass',f:1800,q:.7,v:.45,d:.16});tone(t0+s*sd,190,.08,dest,{wave:'triangle',v:.12})});
+      (b.rim||[]).forEach(s=>noise(t0+s*sd,dest,{type:'bandpass',f:3200,q:4,v:.35,d:.05}));
+      (b.clap||[]).forEach(s=>[0,.012,.024].forEach(o=>noise(t0+s*sd+o,dest,{type:'bandpass',f:1300,q:1,v:.28,d:.09})));
+      for(let s=0;s<32;s++){
+        if(b.h==='2'&&s%2===0)noise(t0+s*sd,dest,{v:.13});
+        if(b.h==='2soft'&&s%2===0)noise(t0+s*sd,dest,{v:.07});
+        if(b.h==='off'&&s%4===2)noise(t0+s*sd,dest,{v:.14,d:.07});
+        if(b.shaker)noise(t0+s*sd,dest,{f:9000,v:s%2?.03:.06,d:.03});
+      }
+      if(b.roll)for(let s=28;s<32;s+=.5)noise(t0+s*sd,dest,{v:.08,d:.025});
+    }else if(p.type==='melody'){
+      phrase(p.seed,.55,3,8).forEach(x=>tone(t0+x.step*sd,freqOf(root*2,scale,x.deg),x.len*sd*.95,dest,{wave:'sawtooth',v:.075,a:.03,cut:2000,vib:4}));
+    }else if(p.type==='lyric'){
+      /* vocal guide: a soft hummed contour under the words */
+      phrase(p.seed,.4,4,5).forEach(x=>tone(t0+x.step*sd,freqOf(root*2,scale,x.deg+2),x.len*sd,dest,{wave:'triangle',v:.06,a:.06,cut:1100,vib:3}));
+      [0,16].forEach(s=>{tone(t0+s*sd,freqOf(root,scale,0),16*sd*.95,dest,{wave:'sine',v:.035,a:.4});tone(t0+s*sd,freqOf(root,scale,4),16*sd*.95,dest,{wave:'sine',v:.025,a:.4})});
+    }else if(p.inst==='oud'){
+      phrase(p.seed,.7,2,9).forEach(x=>{const f=freqOf(root,scale,x.deg);tone(t0+x.step*sd,f,.45,dest,{wave:'sawtooth',v:.14,a:.002,cut:3200,cutEnd:420,q:2});if(x.len>1)tone(t0+(x.step+1)*sd,f,.3,dest,{wave:'sawtooth',v:.08,a:.002,cut:2600,cutEnd:400,q:2})});
+    }else if(p.inst==='qanun'){
+      const r=mulberry(p.seed);for(let s=0;s<32;s++){if(r()<.62){const deg=Math.floor(r()*9);const f=freqOf(root*2,scale,deg);tone(t0+s*sd,f,.3,dest,{wave:'triangle',v:.08,a:.002});tone(t0+s*sd,f*2,.15,dest,{wave:'sine',v:.025,a:.002})}}
+    }else if(p.inst==='perc'){
+      [0,3,8,16,19,24].forEach(s=>kick(t0+s*sd,dest,.55,120,62,.2));
+      [4,6,12,14,20,22,28,30].forEach(s=>noise(t0+s*sd,dest,{type:'bandpass',f:2400,q:2,v:.22,d:.06}));
+      [8,24,26].forEach(s=>[0,.01,.022].forEach(o=>noise(t0+s*sd+o,dest,{type:'bandpass',f:1200,q:.9,v:.3,d:.1})));
+    }else if(p.inst==='bass'){
+      phrase(p.seed,.35,3,4).forEach(x=>tone(t0+x.step*sd,freqOf(root/2,scale,x.deg),x.len*sd*.9,dest,{wave:'sine',v:.3,a:.005}));
+    }
+  }
+  function stop(){
+    if(timer){clearInterval(timer);timer=null}
+    if(session){const g=session;g.gain.setTargetAtTime(0,ctx.currentTime,.03);setTimeout(()=>{try{g.disconnect()}catch(e){}},300);session=null}
+    cur=null;UI.onStop();
+  }
+  /* spec: {key, title, sub, bpm, root, scale, pieces:[piece], file?} */
+  function play(spec){
+    init();ctx.resume();stop();
+    cur=spec;session=ctx.createGain();session.connect(master);
+    spec.gains=spec.pieces.map(()=>{const g=ctx.createGain();g.connect(session);return g});
+    (spec.muted||[]).forEach(i=>{if(spec.gains[i])spec.gains[i].gain.value=0});
+    const sd=60/spec.bpm/4,loop=32*sd;let next=ctx.currentTime+.08;
+    const fileIdx=spec.pieces.findIndex(p=>FILES[p.id]&&FILES[p.id].buf);
+    spec.pieces.forEach((p,i)=>{if(FILES[p.id]&&FILES[p.id].buf){const src=ctx.createBufferSource();src.buffer=FILES[p.id].buf;src.loop=true;src.connect(spec.gains[i]);src.start(next)}});
+    const tick=()=>{while(next<ctx.currentTime+.35){spec.pieces.forEach((p,i)=>{if(!(FILES[p.id]&&FILES[p.id].buf))layer(p,next,sd,spec.root,spec.scale,spec.gains[i])});next+=loop}};
+    tick();timer=setInterval(tick,80);
+    UI.onPlay(spec);
+  }
+  function setMute(i,m){if(cur&&cur.gains&&cur.gains[i])cur.gains[i].gain.setTargetAtTime(m?0:1,ctx.currentTime,.02)}
+  async function decode(file){init();const ab=await file.arrayBuffer();return await ctx.decodeAudioData(ab)}
+  return{play,stop,setMute,decode,get cur(){return cur},get analyser(){return analyser}};
+})();
+
+function playPiece(p){
+  const k='piece:'+p.id;if(Engine.cur&&Engine.cur.key===k){Engine.stop();return}
+  Engine.play({key:k,title:L(p.title),sub:L(C(p.by).name)+' · '+typeLabel(p),bpm:p.bpm,root:KEYS[p.key],scale:p.scale,pieces:[p]});
+}
+function playPath(song,nodeId,muted){
+  const k='song:'+song.id+':'+nodeId;if(Engine.cur&&Engine.cur.key===k&&!muted){Engine.stop();return}
+  const path=pathTo(song,nodeId),root=P(path[0].piece);
+  Engine.play({key:k,title:L(song.title),sub:path.length+' · '+path.map(x=>L(C(P(x.piece).by).name).split(' ')[0]).join(', '),bpm:root.bpm,root:KEYS[root.key],scale:root.scale,pieces:path.map(x=>P(x.piece)),muted:muted||[]});
+}
+const UI={
+  raf:0,
+  onPlay(spec){$('#player').hidden=false;$('#np-title').textContent=spec.title;$('#np-sub').textContent=spec.sub;markPlaying();cancelAnimationFrame(this.raf);this.draw()},
+  onStop(){$('#player').hidden=true;cancelAnimationFrame(this.raf);markPlaying()},
+  draw(){
+    const cv=$('#eq'),g=cv.getContext('2d'),an=Engine.analyser;if(!an)return;const data=new Uint8Array(an.frequencyBinCount);
+    const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const loop=()=>{an.getByteFrequencyData(data);g.clearRect(0,0,cv.width,cv.height);const bars=16,w=cv.width/bars;
+      const grad=g.createLinearGradient(0,cv.height,0,0);grad.addColorStop(0,'#7C3AED');grad.addColorStop(.6,'#FF7AB8');grad.addColorStop(1,'#22D3EE');g.fillStyle=grad;
+      for(let i=0;i<bars;i++){const v=reduce?.5:data[i+1]/255;const h=Math.max(4,v*cv.height);g.beginPath();g.roundRect?g.roundRect(i*w+2,cv.height-h,w-4,h,3):g.rect(i*w+2,cv.height-h,w-4,h);g.fill()}
+      if(!reduce)this.raf=requestAnimationFrame(loop)};
+    loop();
+  }
+};
+function markPlaying(){
+  const k=Engine.cur&&Engine.cur.key;
+  document.querySelectorAll('[data-play-key]').forEach(el=>{const on=el.dataset.playKey===k;el.classList.toggle('on',on);el.innerHTML=on?IC.stop:IC.play;el.setAttribute('aria-label',on?'Stop':'Play');const card=el.closest('.piece');if(card)card.classList.toggle('playing',on)});
+}
+
+/* ---------------- shell ---------------- */
+const NAV=['discover','match','upload','songs','ar','profile'];
+function renderShell(){
+  document.documentElement.lang=S.lang;document.documentElement.dir=S.lang==='ar'?'rtl':'ltr';
+  const r=route().name;
+  const logo=`<a class="logo" href="#discover"><span class="logo-mark" aria-hidden="true"><i style="height:40%"></i><i style="height:85%"></i><i style="height:60%"></i><i style="height:100%"></i><i style="height:50%"></i></span><span>Mixit<small>${S.lang==='ar'?'بالعربي':'Bil Arabi'}</small></span></a>`;
+  const navR=r==='song'?'songs':r;
+  $('#side').innerHTML=`${logo}
+   <nav class="nav">${NAV.map(k=>`<a href="#${k}" class="${navR===k?'on':''}">${IC[k]}<span>${T('nav_'+k)}</span></a>`).join('')}</nav>
+   <div class="side-foot">
+     ${S.me?`<a class="me-card" href="#profile">${av('me')}<span style="min-width:0"><b>${esc(S.me.name)}</b><span>${L(CITIES[S.me.city])} · ${S.me.roles.map(x=>T('t_'+x)).join(', ')}</span></span></a>`:''}
+     <button class="lang-btn" data-act="lang">${IC.globe.replace('<svg','<svg width="16" height="16"')}${T('lang_other')}</button>
+     <p class="demo-flag">${T('demo_flag')}</p>
+   </div><canvas class="side-wave" id="sidewave" width="496" height="280" aria-hidden="true"></canvas>`;
+  $('#topbar').innerHTML=`${logo}<button class="lang-btn" data-act="lang">${T('lang_other')}</button>`;
+  drawWave($('#sidewave'),0.35,false);
+}
+function drawWave(cv,amp=.5,animate=false){
+  if(!cv)return;const g=cv.getContext('2d');const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let t=0;
+  const frame=()=>{const W=cv.width,H=cv.height;g.clearRect(0,0,W,H);
+    const bars=Math.floor(W/9);const grad=g.createLinearGradient(0,0,W,0);grad.addColorStop(0,'#FF7AB8');grad.addColorStop(.5,'#A78BFA');grad.addColorStop(1,'#22D3EE');g.fillStyle=grad;
+    for(let i=0;i<bars;i++){const x=i/bars;const v=(Math.sin(x*9+t)*.5+.5)*(Math.sin(x*3.3-t*.7)*.5+.5)*.8+.12;const h=v*H*amp*1.6;g.globalAlpha=.35+v*.5;g.fillRect(i*9,H-h,5,h)}
+    g.globalAlpha=1;if(animate&&!reduce&&document.body.contains(cv)){t+=.018;requestAnimationFrame(frame)}};
+  frame();
+}
+function route(){const h=(location.hash||'').slice(1);const m=h.match(/^(song|profile)-(.+)$/);if(m)return{name:m[1],id:m[2]};return{name:h||'discover'}}
+function render(){
+  const r=route();
+  $('#app').classList.toggle('gate',!S.me);
+  renderShell();
+  const v=$('#view');
+  if(!S.me){v.innerHTML=viewGate();bindGate();drawWave($('#gatewave'),.55,true);return}
+  const views={discover:viewDiscover,match:viewMatch,upload:viewUpload,songs:viewSongs,song:viewSong,ar:viewAR,profile:viewProfile};
+  v.innerHTML=(views[r.name]||viewDiscover)(r.id);
+  after[r.name]&&after[r.name](r.id);
+  markPlaying();
+}
+const after={};
+window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0)});
+
+/* ---------------- gate ---------------- */
+let gateStep=1;
+function viewGate(){
+  return `<div class="gate-wrap">
+   <section class="gate-hero">
+     <div class="gate-top"><a class="logo" href="#"><span class="logo-mark" aria-hidden="true"><i style="height:40%"></i><i style="height:85%"></i><i style="height:60%"></i><i style="height:100%"></i><i style="height:50%"></i></span><span>Mixit<small>${S.lang==='ar'?'بالعربي':'Bil Arabi'}</small></span></a><button class="lang-btn" data-act="lang">${T('lang_other')}</button></div>
+     <span class="pill" style="border-color:rgba(255,255,255,.2);color:var(--on-deep);align-self:flex-start"><span class="dot" style="background:#22D3EE"></span>${T('invite_only')}</span>
+     <h1>${T('hero_a')}<br><em>${T('hero_b')}</em></h1>
+     <p>${T('hero_sub')}</p>
+     <div class="gate-steps"><div><b>${T('g1t')}</b>${T('g1')}</div><div><b>${T('g2t')}</b>${T('g2')}</div><div><b>${T('g3t')}</b>${T('g3')}</div></div>
+     <canvas id="gatewave" width="1400" height="440" aria-hidden="true"></canvas>
+   </section>
+   <section class="gate-form"><div class="panel card" id="gatepanel">${gateStep===1?gateInvite():gateProfile()}</div></section>
+  </div>`;
+}
+function gateInvite(){return `<div><div class="eyebrow">1 / 2</div><h2 style="margin-top:6px">${T('step_invite')}</h2><p class="muted" style="margin-top:6px">${T('step_invite_sub')}</p></div>
+  <form id="f-invite" class="field" novalidate><label for="invite">${T('step_invite')}</label><input class="input code-input" id="invite" autocomplete="off" placeholder="MIXIT-XXX-0000" value="MIXIT-DXB-0412"><span class="hint">${T('invite_hint')}: <span class="mono">MIXIT-DXB-0412</span></span><span class="err" id="inv-err" hidden>${T('invite_bad')}</span>
+  <button class="btn primary" type="submit" style="margin-top:8px">${T('continue')}</button></form>
+  <button class="btn ghost sm" data-act="guest" style="align-self:center">${T('guest')}</button>`}
+function gateProfile(){return `<div><div class="eyebrow">2 / 2</div><h2 style="margin-top:6px">${T('step_profile')}</h2></div>
+  <form id="f-prof" style="display:flex;flex-direction:column;gap:14px" novalidate>
+   <div class="field"><label for="g-name">${T('your_name')}</label><input class="input" id="g-name" placeholder="${T('name_ph')}" autocomplete="name"></div>
+   <div class="field"><span class="lbl">${T('i_make')}</span><div class="chips" id="g-roles">${TYPES.map((t,i)=>`<button type="button" class="chip ${i===0?'on':''}" data-role="${t}">${T('tp_'+t)}</button>`).join('')}</div></div>
+   <div class="grid-2"><div class="field"><label for="g-city">${T('city')}</label><select class="input" id="g-city">${Object.keys(CITIES).map(c=>`<option value="${c}">${L(CITIES[c])}</option>`).join('')}</select></div>
+   <div class="field"><label for="g-dia">${T('dialect')}</label><select class="input" id="g-dia">${DIALECTS.map(d=>`<option value="${d}">${T('d_'+d)}</option>`).join('')}</select></div></div>
+   <span class="err" id="prof-err" hidden>${T('need_name')}</span>
+   <button class="btn primary" type="submit">${T('join')}</button></form>`}
+function bindGate(){
+  const fi=$('#f-invite');
+  if(fi)fi.addEventListener('submit',e=>{e.preventDefault();const v=$('#invite').value.trim().toUpperCase();if(/^MIXIT-[A-Z]{3}-\d{4}$/.test(v)){gateStep=2;render()}else $('#inv-err').hidden=false});
+  const fp=$('#f-prof');
+  if(fp){fp.addEventListener('click',e=>{const b=e.target.closest('[data-role]');if(b)b.classList.toggle('on')});
+    fp.addEventListener('submit',e=>{e.preventDefault();const name=$('#g-name').value.trim();if(!name){$('#prof-err').hidden=false;return}
+      const roles=[...fp.querySelectorAll('[data-role].on')].map(b=>b.dataset.role);
+      S.me={name,roles:roles.length?roles:['beat'],city:$('#g-city').value,dialect:$('#g-dia').value,joined:new Date().toISOString().slice(0,10)};save();location.hash='discover';render()})}
+}
+
+/* ---------------- discover ---------------- */
+function pieceCard(p){
+  const k='piece:'+p.id,lk=isLiked(k);
+  const body=p.type==='lyric'&&p.lyrics?`<p class="lyric-snip">${esc(p.lyrics.ar.split('\n').slice(0,2).join(' / '))}</p>`:`<div class="c-${p.type}">${waveBars(p.seed)}</div>`;
+  return `<article class="card piece">
+   <div class="row between">${tag(p)}<span class="mono muted">${dateF(p.date)}</span></div>
+   <div><div class="title">${esc(L(p.title))}</div><a class="by" href="#profile-${p.by}" style="margin-top:6px">${av(p.by)}<span><b>${esc(L(C(p.by).name))}</b> · ${L(CITIES[C(p.by).city])}</span></a></div>
+   ${body}
+   <div class="mono meta">${metaLine(p)}</div>
+   <div class="actions"><button class="icon-btn play" data-act="play-piece" data-id="${p.id}" data-play-key="${k}" aria-label="Play">${IC.play}</button>
+   <button class="like ${lk?'on':''}" data-act="like" data-k="${k}" data-piece="${p.id}">${IC.heart}${n(p.likes+(lk?1:0))}</button>
+   <button class="btn sm" data-act="use" data-id="${p.id}">${IC.branch}${T('use')}</button></div></article>`;
+}
+function songCard(s){
+  const lead=pathTo(s,leadNode(s).id);
+  return `<a class="card song-card" href="#song-${s.id}">
+   <div class="row between">${pathTag(s.path)}${stagePill(s.stage)}</div>
+   <div><h3>${esc(L(s.title))}</h3><p class="muted" style="font-size:13px;margin-top:2px">${s.nodes.length} ${T('versions')} · ${songCreators(s).length} ${T('contributors')}</p></div>
+   <div class="stack">${lead.map(x=>{const p=P(x.piece);return `<i style="background:var(--c-${p.type});width:${40+((p.seed*13)%60)}%"></i>`}).join('')}</div>
+   <div class="row between"><div class="avs">${songCreators(s).slice(0,5).map(c=>av(c)).join('')}</div><span class="mono muted">♥ ${n(songLikes(s))} · ▶ ${n(s.plays)}</span></div></a>`;
+}
+function filteredPieces(){
+  const f=S.filter,q=f.q.trim().toLowerCase();
+  return S.pieces.filter(p=>(f.type==='all'||p.type===f.type)&&(f.dialect==='any'||p.dialect===f.dialect)&&(f.mood==='any'||p.mood.includes(f.mood))&&(!q||[p.title.en,p.title.ar,C(p.by).name.en,C(p.by).name.ar].join(' ').toLowerCase().includes(q))).sort((a,b)=>b.date.localeCompare(a.date));
+}
+function viewDiscover(){
+  const f=S.filter;const firstName=S.me.name.split(' ')[0];
+  const trending=[...S.songs].sort((a,b)=>signal(b).total-signal(a).total).slice(0,4);
+  return `<div class="wrap">
+  <section class="band"><canvas id="bandwave" width="1400" height="240" aria-hidden="true"></canvas>
+    <div class="eyebrow">${T('invite_only')}</div><h1>${T('hello')}${S.lang==='ar'?'، ':', '}${esc(firstName)}</h1><p class="muted" style="max-width:60ch">${T('disc_sub')}</p>
+    <div class="row"><a class="btn primary" href="#upload">${IC.upload}${T('up_title')}</a><a class="btn" href="#match">${IC.match}${T('match_title')}</a></div></section>
+  <section style="display:flex;flex-direction:column;gap:14px"><div class="section-head"><h2>${T('trending')}</h2><a href="#songs" class="btn ghost sm">${T('see_all')}</a></div>
+    <div class="songs-row">${trending.map(songCard).join('')}</div></section>
+  <section style="display:flex;flex-direction:column;gap:14px"><div class="section-head"><h2>${T('fresh')}</h2></div>
+    <div class="row" style="gap:12px">
+      <div class="chips" role="group">${['all',...TYPES].map(t=>`<button class="chip ${f.type===t?'on':''}" data-act="ftype" data-v="${t}">${t==='all'?T('all'):T('tp_'+t)}</button>`).join('')}</div>
+      <select class="input" id="f-dia" style="width:auto">${['any',...DIALECTS].map(d=>`<option value="${d}" ${f.dialect===d?'selected':''}>${T('d_'+d)}</option>`).join('')}</select>
+      <select class="input" id="f-mood" style="width:auto">${['any',...MOODS].map(d=>`<option value="${d}" ${f.mood===d?'selected':''}>${T('m_'+d)}</option>`).join('')}</select>
+      <input class="input" id="f-q" type="search" placeholder="${T('search_ph')}" value="${esc(f.q)}" style="flex:1;min-width:180px">
+    </div>
+    <div class="pieces" id="piece-grid">${filteredPieces().map(pieceCard).join('')||`<p class="muted">${T('empty_pieces')}</p>`}</div></section></div>`;
+}
+after.discover=()=>{
+  drawWave($('#bandwave'),.45,true);
+  const upd=()=>{$('#piece-grid').innerHTML=filteredPieces().map(pieceCard).join('')||`<p class="muted">${T('empty_pieces')}</p>`;markPlaying()};
+  $('#f-dia').onchange=e=>{S.filter.dialect=e.target.value;save();upd()};
+  $('#f-mood').onchange=e=>{S.filter.mood=e.target.value;save();upd()};
+  $('#f-q').oninput=e=>{S.filter.q=e.target.value;upd()};
+};
+
+/* ---------------- AI match ---------------- */
+let M={seed:null,dialect:'any',mood:'any',crew:null,idx:{},loading:false};
+function candidates(seed,type,dialect,mood){
+  const seedC=C(seed.by);
+  return S.pieces.filter(p=>p.type===type&&p.id!==seed.id&&p.by!==seed.by).map(p=>{
+    let sc=48;const why=[];
+    if(p.key===seed.key&&p.scale===seed.scale){sc+=18;why.push(T('r_key')+` · ${p.key} ${T('s_'+p.scale)}`)}else if(p.scale===seed.scale){sc+=10;why.push(T('r_scale'))}
+    const d=dialect==='any'?seed.dialect:dialect;if(p.dialect===d||(d==='khaliji'&&p.dialect!=='hijazi')){sc+=10;why.push(T('r_dialect')+` · ${T('d_'+p.dialect)}`)}
+    const m=mood==='any'?seed.mood:[mood];const ov=p.mood.filter(x=>m.includes(x));if(ov.length){sc+=6*ov.length;why.push(T('r_mood')+` · ${ov.map(x=>T('m_'+x)).join(', ')}`)}
+    if(Math.abs(p.bpm-seed.bpm)<=8){sc+=6;why.push(T('r_bpm')+` · ${p.bpm}→${seed.bpm}`)}
+    if(CITIES[C(p.by).city].cc===CITIES[seedC.city].cc){sc+=3;why.push(T('r_city'))}
+    if(p.likes>1000){sc+=Math.min(6,Math.log10(p.likes)*1.5);why.push(T('r_pop')+` · ♥ ${n(p.likes)}`)}
+    return{p,score:Math.min(98,Math.round(sc)),why:why.slice(0,3)}}).sort((a,b)=>b.score-a.score);
+}
+const DEFAULT_SHARE={lyric:.3,melody:.25,instrument:.12,beat:.3};
+function needTypes(seed){return ['beat','lyric','melody','instrument'].filter(t=>t!==seed.type)}
+function viewMatch(){
+  if(!M.seed){const mine=S.pieces.filter(p=>p.by==='me');M.seed=(mine[0]||P('p9')).id}
+  const seed=P(M.seed);
+  const opts=S.pieces.map(p=>`<option value="${p.id}" ${p.id===M.seed?'selected':''}>${esc(L(p.title))} · ${typeLabel(p)} · ${esc(L(C(p.by).name))}</option>`).join('');
+  let results='';
+  if(M.loading)results=`<div class="panel"><p class="muted">${T('finding')}</p><div class="scan"></div></div>`;
+  else if(M.crew){
+    const crew=needTypes(seed).map(t=>{const list=M.crew[t];return list.length?list[(M.idx[t]||0)%list.length]:null}).filter(Boolean);
+    const path=[seed,...crew.map(c=>c.p)];
+    const fake=path.map((p,i)=>({id:'x'+i,piece:p.id,share:i?DEFAULT_SHARE[p.type]:1}));
+    const sp=splits(fake);
+    results=`<div class="section-head"><h2>${T('crew')}</h2><div class="row"><button class="icon-btn play" data-act="crew-play" data-play-key="crew" aria-label="${T('preview_all')}">${IC.play}</button><span>${T('preview_all')}</span></div></div>
+    <div class="crew">
+      <article class="card slot seed"><div class="row between">${tag(seed)}<span class="eyebrow">${T('seed')}</span></div><div><h3>${esc(L(seed.title))}</h3><a class="by row" style="margin-top:6px;gap:8px;text-decoration:none;color:var(--muted);font-size:13px" href="#profile-${seed.by}">${av(seed.by)}${esc(L(C(seed.by).name))}</a></div><div class="c-${seed.type}">${waveBars(seed.seed,34)}</div><div class="mono muted">${metaLine(seed)}</div></article>
+      ${crew.map(c=>`<article class="card slot"><div class="row between">${tag(c.p)}<button class="btn sm ghost" data-act="swap" data-t="${c.p.type}">${IC.swap}${T('swap')}</button></div>
+        <div class="score"><div class="ring" style="--p:${c.score}"><b>${c.score}</b></div><div style="min-width:0"><h3>${esc(L(c.p.title))}</h3><a class="by row" style="margin-top:4px;gap:8px;text-decoration:none;color:var(--muted);font-size:13px" href="#profile-${c.p.by}">${av(c.p.by)}${esc(L(C(c.p.by).name))}</a></div></div>
+        <ul class="reasons">${c.why.map(w=>`<li>${IC.check}<span>${esc(w)}</span></li>`).join('')}</ul>
+        <div class="row"><button class="icon-btn play" data-act="play-piece" data-id="${c.p.id}" data-play-key="piece:${c.p.id}">${IC.play}</button><span class="mono muted">${metaLine(c.p)}</span></div></article>`).join('')}
+    </div>
+    <div class="panel"><div class="section-head"><h3>${T('proposed_split')}</h3></div>${splitBlock(sp)}<p class="note">${T('split_note')}</p>
+      <div class="row"><button class="btn primary" data-act="crew-start">${IC.check}${T('send_invites')}</button></div></div>`;
+  }
+  return `<div class="wrap"><div class="section-head"><div><h1>${T('match_title')}</h1><p style="margin-top:8px">${T('match_sub')}</p></div></div>
+   <div class="match-grid">
+    <form class="panel" id="f-match" novalidate>
+      <div class="field"><label for="m-seed">${T('start_from')}</label><select class="input" id="m-seed">${opts}</select></div>
+      <div class="field"><label for="m-dia">${T('target_d')}</label><select class="input" id="m-dia">${['any',...DIALECTS].map(d=>`<option value="${d}" ${M.dialect===d?'selected':''}>${T('d_'+d)}</option>`).join('')}</select></div>
+      <div class="field"><label for="m-mood">${T('target_m')}</label><select class="input" id="m-mood">${['any',...MOODS].map(d=>`<option value="${d}" ${M.mood===d?'selected':''}>${T('m_'+d)}</option>`).join('')}</select></div>
+      <button class="btn primary" type="submit">${IC.match}${T('find_crew')}</button>
+    </form>
+    <div style="display:flex;flex-direction:column;gap:14px;min-width:0">${results||`<div class="panel"><div class="c-${seed.type}">${waveBars(seed.seed,60)}</div><div class="row">${tag(seed)}<b>${esc(L(seed.title))}</b><span class="mono muted">${metaLine(seed)}</span></div></div>`}</div>
+   </div></div>`;
+}
+after.match=()=>{
+  $('#m-seed').onchange=e=>{M.seed=e.target.value;M.crew=null;render()};
+  $('#m-dia').onchange=e=>{M.dialect=e.target.value};
+  $('#m-mood').onchange=e=>{M.mood=e.target.value};
+  $('#f-match').onsubmit=e=>{e.preventDefault();M.loading=true;M.crew=null;M.idx={};render();
+    setTimeout(()=>{const seed=P(M.seed);M.crew={};needTypes(seed).forEach(t=>M.crew[t]=candidates(seed,t,M.dialect,M.mood));M.loading=false;if(route().name==='match')render()},1100)};
+};
+function currentCrew(){const seed=P(M.seed);return [seed,...needTypes(seed).map(t=>{const l=M.crew[t];return l.length?l[(M.idx[t]||0)%l.length].p:null}).filter(Boolean)]}
+
+/* splits UI */
+const SPLIT_COLORS=['#7C3AED','#FF7AB8','#22D3EE','#F5B94A','#16A34A','#4F46E5','#DB2777','#0891B2'];
+function splitBlock(sp,newNode){
+  return `<div class="split-bar">${sp.map((s,i)=>`<i style="width:${s.pct*100}%;background:${SPLIT_COLORS[i%SPLIT_COLORS.length]}" title="${esc(L(C(s.by).name))}"></i>`).join('')}</div>
+  <table class="split-table"><tbody>${sp.map((s,i)=>{const p=P(s.piece);return `<tr class="${s.node===newNode?'new':''}"><td><div class="row" style="gap:10px;flex-wrap:nowrap"><i style="width:10px;height:10px;border-radius:3px;background:${SPLIT_COLORS[i%SPLIT_COLORS.length]};flex:none"></i>${av(s.by)}<div style="min-width:0"><div style="font-weight:600">${esc(L(C(s.by).name))}${s.by==='me'?` (${T('you')})`:''}</div><div class="hint">${typeLabel(p)} · ${esc(L(p.title))}</div></div></div></td><td>${pct(s.pct)}</td></tr>`}).join('')}</tbody></table>`;
+}
+
+/* ---------------- songs ---------------- */
+function viewSongs(){
+  const list=[...S.songs].sort((a,b)=>b.date.localeCompare(a.date));
+  return `<div class="wrap"><div class="section-head"><div><h1>${T('songs_title')}</h1><p style="margin-top:8px">${T('songs_sub')}</p></div><a class="btn primary" href="#match">${IC.match}${T('match_title')}</a></div>
+  <div class="songs-row">${list.map(songCard).join('')}</div></div>`;
+}
+function treeSVG(song,selId){
+  const kids={};song.nodes.forEach(x=>{(kids[x.parent]=kids[x.parent]||[]).push(x)});
+  const pos={};let leaf=0,maxD=0;
+  (function place(nd,d){maxD=Math.max(maxD,d);const ch=kids[nd.id]||[];if(!ch.length){pos[nd.id]={d,y:leaf++};return}ch.forEach(c=>place(c,d+1));pos[nd.id]={d,y:ch.reduce((s,c)=>s+pos[c.id].y,0)/ch.length}})(song.nodes.find(x=>!x.parent),0);
+  const NW=176,NH=58,GX=44,GY=16,W=(maxD+1)*(NW+GX)-GX+8,H=leaf*(NH+GY)-GY+8,rtl=S.lang==='ar';
+  const X=d=>{const x=4+d*(NW+GX);return rtl?W-x-NW:x},Y=y=>4+y*(NH+GY);
+  const inPath=new Set(pathTo(song,selId).map(x=>x.id));const lead=leadNode(song).id;
+  let edges='',nodes='';
+  song.nodes.forEach(nd=>{if(!nd.parent)return;const a=pos[nd.parent],b=pos[nd.id];
+    const x1=rtl?X(a.d):X(a.d)+NW,y1=Y(a.y)+NH/2,x2=rtl?X(b.d)+NW:X(b.d),y2=Y(b.y)+NH/2,mx=(x1+x2)/2;
+    edges+=`<path class="edge ${inPath.has(nd.id)?'in':''}" d="M${x1} ${y1}C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}"/>`});
+  song.nodes.forEach(nd=>{const p=P(nd.piece),c=C(p.by),x=X(pos[nd.id].d),y=Y(pos[nd.id].y);
+    const ttl=L(p.title),short=ttl.length>19?ttl.slice(0,18)+'…':ttl;const nm=L(c.name).split(' ')[0];
+    const tx=rtl?x+NW-14:x+14,anchor=rtl?'end':'start',px=rtl?x+10:x+NW-10,panchor=rtl?'start':'end';
+    nodes+=`<g class="tn ${inPath.has(nd.id)?'in':''} ${nd.id===selId?'sel':''}" data-act="node" data-song="${song.id}" data-node="${nd.id}" tabindex="0" role="button" aria-label="${esc(ttl)}">
+      <rect class="bg" x="${x}" y="${y}" width="${NW}" height="${NH}" rx="10"/><rect class="bar-${p.type}" x="${rtl?x+NW-5:x}" y="${y+8}" width="5" height="${NH-16}" rx="2.5"/>
+      <text class="t" x="${tx}" y="${y+23}" text-anchor="${anchor}">${esc(short)}</text>
+      <text class="s" x="${tx}" y="${y+42}" text-anchor="${anchor}">${esc(typeLabel(p))} · ${esc(nm)}</text>
+      <text class="p" x="${px}" y="${y+42}" text-anchor="${panchor}">${nd.parent?'+'+pct(nd.share):T('root')}</text>
+      <text class="s" x="${px}" y="${y+23}" text-anchor="${panchor}">${nd.id===lead?'★ ':''}♥${n(nd.likes+(isLiked(song.id+':'+nd.id)?1:0))}</text></g>`});
+  return `<svg style="direction:ltr" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${T('tree')}">${edges}${nodes}</svg>`;
+}
+let muted={};
+function viewSong(id){
+  const s=SG(id);if(!s)return viewSongs();
+  const sel=S.sel[id]&&s.nodes.find(x=>x.id===S.sel[id])?S.sel[id]:leadNode(s).id;
+  const path=pathTo(s,sel),sp=splits(path),k='song:'+s.id+':'+sel,lk=isLiked(s.id+':'+sel);
+  const ms=muted[k]||[];
+  const lyr=path.map(x=>P(x.piece)).find(p=>p.type==='lyric'&&p.lyrics);
+  const root=P(path[0].piece);
+  return `<div class="wrap">
+  <section class="band"><canvas id="bandwave" width="1400" height="240" aria-hidden="true"></canvas>
+    <div class="row">${pathTag(s.path).replace('tag plain','pill')}${stagePill(s.stage)}</div>
+    <h1>${esc(L(s.title))}</h1>
+    <p class="mono" style="color:var(--on-deep-muted)">${root.bpm} ${T('bpm')} · ${root.key} ${T('s_'+root.scale)} · ${T('d_'+root.dialect)}</p>
+    <div class="stats"><div class="stat"><b>${n(songLikes(s))}</b><span>${T('likes')}</span></div><div class="stat"><b>${n(s.plays)}</b><span>${T('plays')}</span></div><div class="stat"><b>${s.nodes.length}</b><span>${T('versions')}</span></div><div class="stat"><b>${songCreators(s).length}</b><span>${T('contributors')}</span></div></div>
+    <div class="row"><button class="icon-btn play" data-act="play-path" data-song="${s.id}" data-node="${sel}" data-play-key="${k}">${IC.play}</button><span>${T('play_version')} (${path.length})</span>
+    <button class="like ${lk?'on':''}" data-act="like" data-k="${s.id}:${sel}">${IC.heart}${T('like_version')}</button></div>
+  </section>
+    <div class="panel"><div class="section-head"><div><h3>${T('tree')}</h3><p class="hint" style="margin-top:2px">${T('tree_hint')}</p></div><button class="btn primary sm" data-act="add-layer" data-song="${s.id}" data-node="${sel}">${IC.branch}${T('add_layer')}</button></div>
+     <div class="tree-box">${treeSVG(s,sel)}</div>
+     <div class="legend">${TYPES.map(t=>`<span><i style="background:var(--c-${t})"></i>${T('tp_'+t)}</span>`).join('')}<span>★ ${T('lead')}</span></div></div>
+  <div class="song-grid">
+   <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+    <div class="panel"><h3>${T('layers')}</h3><div class="layers">${path.map((x,i)=>{const p=P(x.piece),m=ms.includes(i);return `<div class="layer ${m?'muted-l':''}">${av(p.by)}<div style="min-width:0"><div class="nm">${esc(L(p.title))}</div><div class="sb">${typeLabel(p)} · ${esc(L(C(p.by).name))} · ${x.parent?'+'+pct(x.share):T('root')}</div></div>
+      <button class="icon-btn" data-act="play-piece" data-id="${p.id}" data-play-key="piece:${p.id}" aria-label="Play">${IC.play}</button>
+      <button class="tog ${m?'':'on'}" data-act="mute" data-song="${s.id}" data-node="${sel}" data-i="${i}">${m?T('mute'):T('on')}</button></div>`}).join('')}</div></div>
+   </div>
+   <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+    <div class="panel"><h3>${T('split_title')}</h3>${splitBlock(sp)}<p class="note">${IC.lock.replace('<svg','<svg width="13" height="13" style="vertical-align:-2px"')} ${T('split_explain')}</p></div>
+    ${lyr?`<div class="panel"><h3>${T('lyrics_head')} · ${esc(L(lyr.title))}</h3><p class="lyrics">${esc(lyr.lyrics.ar)}</p>${S.lang==='en'?`<div><div class="eyebrow">${T('translation')}</div><p class="lyrics-tr" style="margin-top:6px">${esc(lyr.lyrics.en)}</p></div>`:''}</div>`:''}
+   </div>
+  </div></div>`;
+}
+after.song=()=>drawWave($('#bandwave'),.45,true);
+
+/* ---------------- A&R ---------------- */
+const STAGES=['rising','review','offer','signed'];
+function spark(vals){const W=200,H=30,mx=Math.max(...vals),mn=Math.min(...vals),sx=i=>i/(vals.length-1)*(W-6)+3,sy=v=>H-4-(v-mn)/((mx-mn)||1)*(H-8);
+  const d=vals.map((v,i)=>`${i?'L':'M'}${sx(i).toFixed(1)} ${sy(v).toFixed(1)}`).join('');
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path class="a" d="${d}L${sx(vals.length-1)} ${H}L${sx(0)} ${H}Z"/><path class="l" d="${d}"/><circle cx="${sx(vals.length-1)}" cy="${sy(vals[vals.length-1])}" r="3"/></svg>`}
+function viewAR(){
+  const col=st=>S.songs.filter(s=>(s.stage==='open'?'rising':s.stage)===st).sort((a,b)=>signal(b).total-signal(a).total);
+  const next={rising:'review',review:'offer',offer:'signed'};
+  return `<div class="wrap"><div class="section-head"><div><h1>${T('ar_title')}</h1><p style="margin-top:8px">${T('ar_sub')}</p></div></div>
+  <div class="board">${STAGES.map(st=>`<div class="col"><div class="col-head st-${st}"><h3>${T('st_'+st)}</h3><span class="mono muted">${col(st).length}</span></div>
+   ${col(st).map(s=>{const g=signal(s),lead=leadNode(s);return `<article class="card ar-card">
+     <div class="row between"><a href="#song-${s.id}" style="color:var(--fg);text-decoration:none"><h3>${esc(L(s.title))}</h3></a>${pathTag(s.path)}</div>
+     <div class="sig"><span class="eyebrow">${T('signal')}</span><div class="meter"><i style="width:${g.total}%"></i></div><b>${g.total}</b></div>
+     <div class="kv"><span>${T('likes')}</span><b>${n(songLikes(s))}</b><span>${T('plays')}</span><b>${n(s.plays)}</b><span>${T('versions')}</span><b>${s.nodes.length}</b><span>${T('growth')}</span><b>+${pct(g.gr)}</b></div>
+     ${spark(s.growth)}
+     <div class="row between"><div class="avs">${pathTo(s,lead.id).map(x=>av(P(x.piece).by)).join('')}</div>
+     <button class="icon-btn play" data-act="play-path" data-song="${s.id}" data-node="${lead.id}" data-play-key="song:${s.id}:${lead.id}" aria-label="${T('listen')}">${IC.play}</button></div>
+     ${next[st]?`<div class="row"><button class="btn sm ${st==='review'?'primary':''}" data-act="advance" data-id="${s.id}">${T(st==='rising'?'adv_review':st==='review'?'adv_offer':'adv_signed')}</button>${st!=='rising'?`<button class="btn sm ghost" data-act="pass" data-id="${s.id}">${T('pass')}</button>`:''}</div>`:''}
+   </article>`}).join('')}</div>`).join('')}</div></div>`;
+}
+
+/* ---------------- upload ---------------- */
+let U={type:'beat',inst:'oud',moods:['night'],file:null,done:null,share:20};
+function viewUpload(){
+  if(U.done){const p=P(U.done.id);return `<div class="wrap"><div class="panel" style="max-width:720px">
+    <div class="row">${tag(p)}<span class="pill st-signed"><span class="dot"></span>${T('posted')}</span></div><h1>${esc(L(p.title))}</h1>
+    <div class="c-${p.type}">${p.type==='lyric'?`<p class="lyrics">${esc(p.lyrics.ar)}</p>`:waveBars(p.seed,70)}</div>
+    <div class="row"><button class="icon-btn play" data-act="play-piece" data-id="${p.id}" data-play-key="piece:${p.id}">${IC.play}</button><span class="mono muted">${metaLine(p)}</span></div>
+    <div class="field"><span class="lbl">${IC.lock.replace('<svg','<svg width="13" height="13" style="vertical-align:-2px"')} ${T('proof')}</span><div class="proof">SHA-256 ${U.done.hash}<br>${U.done.ts}</div></div>
+    <div class="row"><button class="btn primary" data-act="match-from" data-id="${p.id}">${IC.match}${T('find_for')}</button><button class="btn" data-act="use" data-id="${p.id}">${IC.branch}${T('use')}</button><a class="btn ghost" href="#discover">${T('view_feed')}</a><button class="btn ghost" data-act="up-again">${T('up_title')}</button></div></div></div>`}
+  const isLyric=U.type==='lyric';
+  return `<div class="wrap"><div class="section-head"><div><h1>${T('up_title')}</h1><p style="margin-top:8px">${T('up_sub')}</p></div></div>
+  <div class="up-grid"><form class="panel" id="f-up" novalidate>
+   <div class="field"><span class="lbl">${T('type')}</span><div class="seg">${TYPES.map(t=>`<button type="button" class="c-${t} ${U.type===t?'on':''}" data-act="up-type" data-v="${t}">${IC[t]}<span style="color:var(--fg)">${T('t_'+t)}</span></button>`).join('')}</div></div>
+   ${U.type==='instrument'?`<div class="field"><label for="u-inst">${T('inst')}</label><select class="input" id="u-inst">${['oud','qanun','perc','bass'].map(i=>`<option value="${i}" ${U.inst===i?'selected':''}>${T('i_'+i)}</option>`).join('')}</select></div>`:''}
+   <div class="field"><label for="u-title">${T('title')}</label><input class="input" id="u-title" placeholder="${T('title_ph')}" required></div>
+   ${isLyric?`<div class="field"><label for="u-lyr">${T('lyrics_lbl')}</label><textarea class="input" id="u-lyr" dir="rtl" placeholder="${T('lyrics_ph')}">يا بحر خذني لبعيد\nوين الهوى يرجع جديد</textarea></div>`
+     :`<div class="field"><span class="lbl">${T('file')}</span><label class="drop" for="u-file"><input type="file" id="u-file" accept="audio/*">${IC.upload.replace('<svg','<svg width="24" height="24"')}<b id="u-fname">${U.file?esc(U.file.name):T('file_drop')}</b><span class="hint">${T('file_none')}</span></label></div>`}
+   <div class="grid-3"><div class="field"><label for="u-bpm">${T('bpm')}</label><input class="input mono" id="u-bpm" type="number" min="60" max="180" value="96"></div>
+     <div class="field"><label for="u-key">${T('key')}</label><select class="input" id="u-key">${Object.keys(KEYS).map(k=>`<option ${k==='D'?'selected':''}>${k}</option>`).join('')}</select></div>
+     <div class="field"><label for="u-scale">${T('maqam')}</label><select class="input" id="u-scale">${Object.keys(SCALES).map(k=>`<option value="${k}">${T('s_'+k)}</option>`).join('')}</select></div></div>
+   <div class="field"><label for="u-dia">${T('dialect')}</label><select class="input" id="u-dia">${DIALECTS.map(d=>`<option value="${d}" ${S.me.dialect===d?'selected':''}>${T('d_'+d)}</option>`).join('')}</select></div>
+   <div class="field"><span class="lbl">${T('mood')}</span><div class="chips">${MOODS.map(m=>`<button type="button" class="chip ${U.moods.includes(m)?'on':''}" data-act="up-mood" data-v="${m}">${T('m_'+m)}</button>`).join('')}</div></div>
+   <div class="field"><label for="u-open">${T('open_to')}</label><select class="input" id="u-open"><option value="both">${T('o_both')}</option><option value="remix">${T('o_remix')}</option><option value="ai">${T('o_ai')}</option></select></div>
+   <div class="field"><label for="u-share">${T('min_share')}: <span class="mono" id="u-share-v">${U.share}%</span></label><input type="range" id="u-share" min="5" max="40" step="1" value="${U.share}"></div>
+   <label class="check"><input type="checkbox" id="u-own"><span>${T('own')}</span></label>
+   <span class="err" id="u-err" hidden></span>
+   <button class="btn primary" type="submit" id="u-post">${IC.upload}${T('post')}</button>
+  </form>
+  <aside class="panel"><h3>${T('up_side_t')}</h3><p class="muted">${T('up_side')}</p><p class="note">${IC.lock.replace('<svg','<svg width="13" height="13" style="vertical-align:-2px"')} ${T('up_rules')}</p></aside></div></div>`;
+}
+after.upload=()=>{
+  const f=$('#f-up');if(!f)return;
+  const fi=$('#u-file');if(fi)fi.onchange=e=>{U.file=e.target.files[0]||null;$('#u-fname').textContent=U.file?U.file.name:T('file_drop')};
+  const inst=$('#u-inst');if(inst)inst.onchange=e=>U.inst=e.target.value;
+  $('#u-share').oninput=e=>{U.share=+e.target.value;$('#u-share-v').textContent=U.share+'%'};
+  f.onsubmit=async e=>{e.preventDefault();const err=$('#u-err');const title=$('#u-title').value.trim();
+    if(!title){err.textContent=T('title')+' ·  '+T('title_ph');err.hidden=false;return}
+    if(!$('#u-own').checked){err.textContent=T('own');err.hidden=false;return}
+    err.hidden=true;$('#u-post').disabled=true;
+    const id='u'+Date.now().toString(36);const lyr=U.type==='lyric'?$('#u-lyr').value.trim():null;
+    let bytes;if(U.file)bytes=await U.file.arrayBuffer();else bytes=new TextEncoder().encode(title+'|'+(lyr||'')+'|'+id);
+    let hash='';try{const h=await crypto.subtle.digest('SHA-256',bytes);hash=[...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('')}catch(x){hash=Array.from({length:64},()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join('')}
+    const p={id,type:U.type,by:'me',title:{en:title,ar:title},bpm:Math.max(60,Math.min(180,+$('#u-bpm').value||96)),key:$('#u-key').value,scale:$('#u-scale').value,dialect:$('#u-dia').value,mood:U.moods.length?[...U.moods]:['night'],seed:Math.floor(Math.random()*9000)+200,likes:0,plays:0,date:new Date().toISOString().slice(0,10),minShare:U.share/100,openTo:$('#u-open').value,hash};
+    if(U.type==='beat')p.style=['trap','afro','rnb','khaleeji'][p.seed%4];
+    if(U.type==='instrument')p.inst=U.inst;
+    if(lyr)p.lyrics={ar:lyr,en:lyr};
+    if(U.file){try{FILES[id]={buf:await Engine.decode(U.file)}}catch(x){}}
+    S.pieces.unshift(p);save();
+    U.done={id,hash,ts:new Date().toISOString().replace('T',' ').slice(0,19)+' UTC'};U.file=null;render();toast(T('posted'));
+  };
+};
+
+/* ---------------- profile ---------------- */
+function viewProfile(id){
+  id=id||'me';const c=C(id);const mine=S.pieces.filter(p=>p.by===id);
+  const on=S.songs.filter(s=>s.nodes.some(x=>P(x.piece).by===id));
+  const likes=mine.reduce((a,p)=>a+p.likes,0);
+  const shares=on.map(s=>{const sp=splits(pathTo(s,leadNode(s).id)).filter(x=>x.by===id);return{s,v:sp.reduce((a,b)=>a+b.pct,0)}});
+  const avg=shares.length?shares.reduce((a,b)=>a+b.v,0)/shares.length:0;
+  const tab=S.tab;
+  return `<div class="wrap">
+  <section class="band"><canvas id="bandwave" width="1400" height="240" aria-hidden="true"></canvas>
+   <div class="prof-head">${av(id,'lg')}<div style="min-width:0"><h1>${esc(L(c.name))}</h1><p class="muted" style="margin-top:4px">${L(CITIES[c.city])} · ${c.roles.map(r=>T('t_'+r)).join(', ')} · ${T('joined')} ${dateF(c.joined)}</p><p style="margin-top:8px;max-width:60ch">${esc(L(c.bio))}</p></div></div>
+   <div class="stats"><div class="stat"><b>${mine.length}</b><span>${T('prof_pieces')}</span></div><div class="stat"><b>${on.length}</b><span>${T('prof_songs')}</span></div><div class="stat"><b>${n(likes)}</b><span>${T('prof_likes')}</span></div><div class="stat"><b>${pct(avg)}</b><span>${T('prof_share')}</span></div></div>
+  </section>
+  <div class="tabs" role="tablist"><button class="${tab==='pieces'?'on':''}" data-act="tab" data-v="pieces">${T('prof_pieces')}</button><button class="${tab==='songs'?'on':''}" data-act="tab" data-v="songs">${T('prof_songs')}</button></div>
+  ${tab==='pieces'?(mine.length?`<div class="pieces">${mine.map(pieceCard).join('')}</div>`:`<div class="panel"><p class="muted">${T('empty_pieces')}</p><a class="btn primary" href="#upload" style="align-self:flex-start">${IC.upload}${T('upload_first')}</a></div>`)
+   :(shares.length?`<div class="list">${shares.map(({s,v})=>`<a class="card list-row" href="#song-${s.id}" style="text-decoration:none;color:var(--fg)"><div class="grow"><b>${esc(L(s.title))}</b><div class="hint">${T('p_'+s.path)} · ${s.nodes.length} ${T('versions')}</div></div>${stagePill(s.stage)}<span class="mono">${T('your_share')} ${pct(v)}</span></a>`).join('')}</div>`:`<div class="panel"><p class="muted">${T('empty_pieces')}</p></div>`)}
+  ${id==='me'?`<div><button class="btn ghost sm" data-act="reset">${T('reset')}</button></div>`:''}
+  </div>`;
+}
+after.profile=()=>drawWave($('#bandwave'),.45,true);
+
+/* ---------------- modals ---------------- */
+function openModal(html,onBind){$('#modal-box').innerHTML=html;$('#modal').hidden=false;onBind&&onBind($('#modal-box'));const f=$('#modal-box').querySelector('button,select,input');f&&f.focus()}
+function closeModal(){$('#modal').hidden=true;$('#modal-box').innerHTML=''}
+function modalHead(t,sub){return `<div class="modal-head"><div><h2>${t}</h2>${sub?`<p class="muted" style="margin-top:6px">${sub}</p>`:''}</div><button class="icon-btn" data-act="close" aria-label="${T('close')}">${IC.x}</button></div>`}
+
+function useModal(pid){
+  const p=P(pid);let choice='new';
+  const songOpts=S.songs.map(s=>`<option value="${s.id}">${esc(L(s.title))}</option>`).join('');
+  const verOpts=sid=>{const s=SG(sid);return s.nodes.map(x=>`<option value="${x.id}">${pathTo(s,x.id).map(y=>esc(L(P(y.piece).title))).join(' → ')}</option>`).join('')};
+  openModal(`${modalHead(T('use_title'),esc(L(p.title))+' · '+typeLabel(p))}
+   <div style="display:flex;flex-direction:column;gap:8px">
+    <button class="opt on" data-c="new">${IC.songs.replace('<svg','<svg width="20" height="20"')}<div><b>${T('use_new')}</b><span>${T('use_new_sub')}</span></div></button>
+    <button class="opt" data-c="ai">${IC.match.replace('<svg','<svg width="20" height="20"')}<div><b>${T('use_ai')}</b><span>${T('use_ai_sub')}</span></div></button>
+    <button class="opt" data-c="add">${IC.branch.replace('<svg','<svg width="20" height="20"')}<div><b>${T('use_add')}</b><span>${T('use_add_sub')}</span></div></button>
+   </div>
+   <div id="use-add" hidden style="display:flex;flex-direction:column;gap:12px"><div class="field"><label for="ua-song">${T('pick_song')}</label><select class="input" id="ua-song">${songOpts}</select></div><div class="field"><label for="ua-ver">${T('pick_version')}</label><select class="input" id="ua-ver">${verOpts(S.songs[0].id)}</select></div></div>
+   <div class="row" style="justify-content:flex-end"><button class="btn ghost" data-act="close">${T('cancel')}</button><button class="btn primary" id="use-go">${T('go')}</button></div>`,box=>{
+    box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{choice=b.dataset.c;box.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on',x===b));box.querySelector('#use-add').hidden=choice!=='add'});
+    box.querySelector('#ua-song').onchange=e=>box.querySelector('#ua-ver').innerHTML=verOpts(e.target.value);
+    box.querySelector('#use-go').onclick=()=>{
+      if(choice==='ai'){closeModal();M={seed:pid,dialect:'any',mood:'any',crew:null,idx:{},loading:false};location.hash='match';return}
+      if(choice==='new'){const s={id:'s'+Date.now().toString(36),title:{en:p.title.en,ar:p.title.ar},path:'community',stage:'open',plays:0,growth:[0,0,0,0,0,0,0.1],date:new Date().toISOString().slice(0,10),nodes:[{id:'n1',piece:pid,parent:null,share:1,likes:0}]};S.songs.unshift(s);save();closeModal();toast(T('song_started'));location.hash='song-'+s.id;return}
+      const sid=box.querySelector('#ua-song').value,nid=box.querySelector('#ua-ver').value;closeModal();addLayerModal(sid,nid,pid);
+    };
+  });
+}
+function addLayerModal(sid,nid,preselect){
+  const s=SG(sid);const base=pathTo(s,nid);const used=new Set(base.map(x=>x.piece));
+  const mine=S.pieces.filter(p=>(p.by==='me'||p.id===preselect)&&!used.has(p.id));
+  let pick=preselect&&!used.has(preselect)?preselect:(mine[0]&&mine[0].id)||'__new',share=.2,newType='melody';
+  const preview=()=>{const nd={id:'__n',piece:pick==='__new'?'__tmp':pick,parent:nid,share};
+    if(pick==='__new'){S.pieces.push({id:'__tmp',type:newType,inst:newType==='instrument'?'oud':undefined,by:'me',title:{en:$('#al-title')?.value||T('new_title_ph'),ar:$('#al-title')?.value||T('new_title_ph')},bpm:96,key:'D',scale:'hijaz',dialect:'khaliji',mood:[],seed:1})}
+    const html=splitBlock(splits([...base,nd]),'__n');S.pieces=S.pieces.filter(p=>p.id!=='__tmp');return html};
+  openModal(`${modalHead(T('add_title'),T('add_sub'))}
+   <div class="note">${base.map(x=>esc(L(P(x.piece).title))).join(' → ')}</div>
+   <div class="field"><span class="lbl">${T('choose_piece')}</span>${mine.length?'':`<p class="hint">${T('no_pieces')}</p>`}
+    <div style="display:flex;flex-direction:column;gap:8px" id="al-list">${mine.map(p=>`<button type="button" class="opt ${pick===p.id?'on':''}" data-p="${p.id}">${tag(p)}<div><b>${esc(L(p.title))}</b><span class="mono">${metaLine(p)}</span></div></button>`).join('')}
+    <button type="button" class="opt ${pick==='__new'?'on':''}" data-p="__new">${IC.upload.replace('<svg','<svg width="20" height="20"')}<div><b>${T('or_new')}</b><span>${T('file_none')}</span></div></button></div></div>
+   <div id="al-new" ${pick==='__new'?'':'hidden'} class="grid-2"><div class="field"><label for="al-type">${T('type')}</label><select class="input" id="al-type">${TYPES.filter(t=>t!=='beat').map(t=>`<option value="${t}" ${t===newType?'selected':''}>${T('t_'+t)}</option>`).join('')}</select></div><div class="field"><label for="al-title">${T('title')}</label><input class="input" id="al-title" placeholder="${T('new_title_ph')}"></div></div>
+   <div class="field"><label for="al-share">${T('share_ask')}: <span class="mono" id="al-share-v">${pct(share)}</span></label><input type="range" id="al-share" min="5" max="40" value="20"></div>
+   <div id="al-split">${preview()}</div>
+   <label class="check"><input type="checkbox" id="al-agree"><span>${T('agree')}</span></label>
+   <div class="row" style="justify-content:flex-end"><button class="btn ghost" data-act="close">${T('cancel')}</button><button class="btn primary" id="al-go" disabled>${IC.branch}${T('add_btn')}</button></div>`,box=>{
+    const re=()=>box.querySelector('#al-split').innerHTML=preview();
+    box.querySelector('#al-list').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;pick=b.dataset.p;box.querySelectorAll('#al-list .opt').forEach(x=>x.classList.toggle('on',x===b));box.querySelector('#al-new').hidden=pick!=='__new';re()};
+    box.querySelector('#al-type').onchange=e=>{newType=e.target.value;re()};
+    box.querySelector('#al-title').oninput=re;
+    box.querySelector('#al-share').oninput=e=>{share=e.target.value/100;box.querySelector('#al-share-v').textContent=pct(share);re()};
+    box.querySelector('#al-agree').onchange=e=>box.querySelector('#al-go').disabled=!e.target.checked;
+    box.querySelector('#al-go').onclick=()=>{
+      let pid=pick;const root=P(base[0].piece);
+      if(pick==='__new'){pid='u'+Date.now().toString(36);const ttl=box.querySelector('#al-title').value.trim()||T('t_'+newType);
+        const np={id:pid,type:newType,by:'me',title:{en:ttl,ar:ttl},bpm:root.bpm,key:root.key,scale:root.scale,dialect:S.me.dialect,mood:root.mood.slice(),seed:Math.floor(Math.random()*9000)+200,likes:0,plays:0,date:new Date().toISOString().slice(0,10)};
+        if(newType==='instrument')np.inst=['oud','qanun','bass'][np.seed%3];if(newType==='lyric')np.lyrics={ar:'يا ليل خذني على هواك\nوخلّ القمر يشهد معاك',en:'Night, take me where you go\nAnd let the moon be our witness'};S.pieces.unshift(np)}
+      const nn={id:'n'+Date.now().toString(36),piece:pid,parent:nid,share,likes:0};s.nodes.push(nn);S.sel[sid]=nn.id;save();closeModal();toast(T('added'));
+      if(route().name==='song'&&route().id===sid)render();else location.hash='song-'+sid;
+    };
+  });
+}
+function offerModal(sid){
+  const s=SG(sid),lead=leadNode(s),sp=splits(pathTo(s,lead.id));
+  openModal(`${modalHead(T('offer_title'),T('offer_sub'))}
+   <div class="row"><h3>${esc(L(s.title))}</h3>${pathTag(s.path)}</div>
+   <div class="grid-2"><div class="field"><label for="of-label">${T('label_share')}</label><input class="input mono" id="of-label" type="number" min="0" max="90" placeholder="${T('label_ph')}"><span class="hint">${T('label_ph')}</span></div>
+   <div class="field"><label for="of-adv">${T('advance')}</label><input class="input mono" id="of-adv" type="number" min="0" step="1000" value="15000"></div></div>
+   <div><div class="eyebrow" style="margin-bottom:8px">${T('creator_pool')}</div>${splitBlock(sp)}</div>
+   <div class="row" style="justify-content:flex-end"><button class="btn ghost" data-act="close">${T('cancel')}</button><button class="btn primary" id="of-go">${T('send_offer')}</button></div>`,box=>{
+    box.querySelector('#of-go').onclick=()=>{s.stage='offer';save();closeModal();toast(T('offer_sent'));render()};
+  });
+}
+
+/* ---------------- events ---------------- */
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');if(!el)return;const a=el.dataset.act,d=el.dataset;
+  if(a==='lang'){S.lang=S.lang==='en'?'ar':'en';save();render();return}
+  if(a==='guest'){S.me={name:T('guest_name'),roles:['beat'],city:'dubai',dialect:'emirati',joined:new Date().toISOString().slice(0,10)};save();location.hash='discover';render();return}
+  if(a==='close'){closeModal();return}
+  if(a==='play-piece'){e.preventDefault();playPiece(P(d.id));return}
+  if(a==='play-path'){playPath(SG(d.song),d.node,muted['song:'+d.song+':'+d.node]);return}
+  if(a==='like'){const k=d.k;S.liked=isLiked(k)?S.liked.filter(x=>x!==k):[...S.liked,k];save();
+    if(route().name==='song'||route().name==='ar')render();else{const on=isLiked(k);el.classList.toggle('on',on);if(d.piece){const p=P(d.piece);el.innerHTML=IC.heart+n(p.likes+(on?1:0))}}if(isLiked(k))toast(T('liked'));return}
+  if(a==='ftype'){S.filter.type=d.v;save();render();return}
+  if(a==='use'){useModal(d.id);return}
+  if(a==='node'){S.sel[d.song]=d.node;save();const k='song:'+d.song+':'+d.node;render();if(Engine.cur&&Engine.cur.key.startsWith('song:'+d.song))playPath(SG(d.song),d.node,muted[k]);return}
+  if(a==='add-layer'){addLayerModal(d.song,d.node);return}
+  if(a==='mute'){const k='song:'+d.song+':'+d.node,i=+d.i;const m=muted[k]||[];muted[k]=m.includes(i)?m.filter(x=>x!==i):[...m,i];
+    if(Engine.cur&&Engine.cur.key===k)Engine.setMute(i,muted[k].includes(i));render();return}
+  if(a==='swap'){M.idx[d.t]=(M.idx[d.t]||0)+1;render();return}
+  if(a==='crew-play'){const crew=currentCrew(),seed=crew[0];if(Engine.cur&&Engine.cur.key==='crew'){Engine.stop();return}
+    Engine.play({key:'crew',title:T('crew'),sub:crew.map(p=>L(C(p.by).name).split(' ')[0]).join(', '),bpm:seed.bpm,root:KEYS[seed.key],scale:seed.scale,pieces:crew});return}
+  if(a==='crew-start'){const crew=currentCrew();const s={id:'s'+Date.now().toString(36),title:{en:crew[0].title.en,ar:crew[0].title.ar},path:'ai',stage:'open',plays:0,growth:[0,0,0,0,0,0,.1],date:new Date().toISOString().slice(0,10),nodes:[]};
+    let parent=null;crew.forEach((p,i)=>{const id='n'+(i+1);s.nodes.push({id,piece:p.id,parent,share:i?DEFAULT_SHARE[p.type]:1,likes:0});parent=id});
+    S.songs.unshift(s);save();M.crew=null;toast(T('crew_started'));location.hash='song-'+s.id;return}
+  if(a==='advance'){const s=SG(d.id);if(s.stage==='review'){offerModal(d.id);return}
+    s.stage=s.stage==='rising'||s.stage==='open'?'review':s.stage==='offer'?'signed':s.stage;save();render();toast(s.stage==='signed'?T('signed_t'):T('moved')+' '+T('st_'+s.stage));return}
+  if(a==='pass'){const s=SG(d.id);s.stage='open';save();render();toast(T('passed'));return}
+  if(a==='up-type'){U.type=d.v;render();return}
+  if(a==='up-mood'){U.moods=U.moods.includes(d.v)?U.moods.filter(x=>x!==d.v):[...U.moods,d.v];el.classList.toggle('on');return}
+  if(a==='up-again'){U.done=null;render();return}
+  if(a==='match-from'){M={seed:d.id,dialect:'any',mood:'any',crew:null,idx:{},loading:false};U.done=null;location.hash='match';return}
+  if(a==='tab'){S.tab=d.v;save();render();return}
+  if(a==='reset'){Engine.stop();const lang=S.lang,me=S.me;S=fresh();S.lang=lang;S.me=me;save();render();toast(T('reset_done'));return}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&!$('#modal').hidden)closeModal();
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches('g.tn')){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}))}
+});
+$('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+$('#np-stop').innerHTML=IC.stop;$('#np-stop').onclick=()=>Engine.stop();
+render();
+</script>
+</body>
+</html>
